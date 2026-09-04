@@ -1,6 +1,6 @@
 # Environment files
 .env
-.env.*
+backend/.env
 !.env.example
 
 # Node
@@ -28,3 +28,6 @@ Thumbs.db
 
 # Uploaded files
 backend/uploads/
+
+storage
+payment_qr.png
