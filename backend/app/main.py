@@ -14,7 +14,9 @@ from app.routes.products import router as products_router
 from app.routes.order import router as orders_router
 from app.routes.user import router as user_router
 from app.routes.payments import router as payments_router
+from app.routes.coupons import router as coupons_router
 from app.routes.downloads import router as downloads_router
+from app.routes.analytics import router as analytics_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,8 +53,10 @@ app.include_router(admin_router)
 app.include_router(products_router)
 app.include_router(orders_router)
 app.include_router(user_router)
+app.include_router(coupons_router)
 app.include_router(payments_router)
 app.include_router(downloads_router)
+app.include_router(analytics_router)
 
 @app.get("/")
 def root():

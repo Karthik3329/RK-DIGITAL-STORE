@@ -1,20 +1,22 @@
 from datetime import datetime, timezone
 from pathlib import Path
-import secrets
+import uuid
 
 from bson import ObjectId
+
 from fastapi import (
     APIRouter,
     Depends,
     File,
+    Form,
     HTTPException,
     UploadFile,
 )
+
 from fastapi.responses import FileResponse
 
 from app.config import settings
 from app.database import get_database
-from app.schemas.order_schema import PaymentProofSubmit
 from app.utils.dependencies import get_current_user
 
 
@@ -24,9 +26,9 @@ router = APIRouter(
 )
 
 
-# =========================================================
-# PAYMENT CONFIGURATION
-# =========================================================
+# ============================================================
+# PAYMENT SCREENSHOT SETTINGS
+# ============================================================
 
 ALLOWED_IMAGE_TYPES = {
     "image/jpeg",
@@ -37,20 +39,20 @@ ALLOWED_IMAGE_TYPES = {
 MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024
 
 
-# =========================================================
+# ============================================================
 # PAYMENT PROOF DIRECTORY
-# =========================================================
+# ============================================================
 
 def get_payment_proof_directory() -> Path:
     """
     Returns:
 
-    D:\digital-store\backend\storage\payment_proofs
+    D:\\digital-store\\backend\\storage\\payment_proofs
     """
 
-    backend_directory = Path(
-        __file__
-    ).resolve().parents[2]
+    backend_directory = (
+        Path(__file__).resolve().parents[2]
+    )
 
     directory = (
         backend_directory
@@ -66,17 +68,53 @@ def get_payment_proof_directory() -> Path:
     return directory
 
 
-# =========================================================
+# ============================================================
+# PAYMENT QR PATH
+# ============================================================
+
+def get_payment_qr_path() -> Path:
+    """
+    Resolves PAYMENT_QR_PATH from .env.
+
+    Example:
+
+    PAYMENT_QR_PATH=payment_qr.png
+
+    becomes:
+
+    D:\\digital-store\\backend\\payment_qr.png
+    """
+
+    backend_directory = (
+        Path(__file__).resolve().parents[2]
+    )
+
+    configured_path = Path(
+        settings.PAYMENT_QR_PATH
+    )
+
+    # Absolute path
+    if configured_path.is_absolute():
+        qr_path = configured_path
+
+    # Relative path
+    else:
+        qr_path = (
+            backend_directory
+            / configured_path
+        )
+
+    return qr_path.resolve()
+
+
+# ============================================================
 # PAYMENT DETAILS
-# =========================================================
+# ============================================================
 
 @router.get("/details")
-def get_payment_details(
-    current_user=Depends(get_current_user),
-):
+def get_payment_details():
     """
-    Returns the UPI payment information
-    required by the checkout page.
+    Returns UPI payment details used by Checkout.
     """
 
     return {
@@ -85,60 +123,117 @@ def get_payment_details(
     }
 
 
-# =========================================================
-# PAYMENT QR CODE
-# =========================================================
+# ============================================================
+# PAYMENT QR
+# ============================================================
 
 @router.get("/qr")
 def get_payment_qr():
     """
-    Serves the store's UPI QR code.
+    Returns the CURRENT payment QR image.
+
+    Important:
+    - No browser caching
+    - No duplicate code
+    - Reads the configured QR file every request
     """
 
-    backend_directory = Path(
-        __file__
-    ).resolve().parents[2]
+    qr_path = get_payment_qr_path()
 
-    qr_path = (
-        backend_directory
-        / settings.PAYMENT_QR_PATH
-    ).resolve()
+    print("========================================")
+    print("PAYMENT QR REQUEST")
+    print("Configured QR :", settings.PAYMENT_QR_PATH)
+    print("Resolved QR   :", qr_path)
+    print("QR EXISTS     :", qr_path.exists())
+
+    if qr_path.exists():
+        print(
+            "QR SIZE       :",
+            qr_path.stat().st_size
+        )
+    else:
+        print("QR SIZE       : N/A")
+
+    print("========================================")
+
+    # ========================================================
+    # CHECK FILE EXISTS
+    # ========================================================
 
     if not qr_path.exists():
         raise HTTPException(
             status_code=404,
-            detail="Payment QR code not found.",
+            detail=(
+                "Payment QR image was not found. "
+                f"Expected file: {qr_path}"
+            ),
         )
+
+    # ========================================================
+    # CHECK FILE
+    # ========================================================
 
     if not qr_path.is_file():
         raise HTTPException(
-            status_code=404,
-            detail="Payment QR code is not a valid file.",
+            status_code=400,
+            detail=(
+                "Payment QR path is not a file: "
+                f"{qr_path}"
+            ),
         )
+
+    # ========================================================
+    # DETECT IMAGE TYPE
+    # ========================================================
+
+    media_types = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".webp": "image/webp",
+    }
+
+    media_type = media_types.get(
+        qr_path.suffix.lower(),
+        "application/octet-stream",
+    )
+
+    # ========================================================
+    # RETURN CURRENT QR
+    # ========================================================
 
     return FileResponse(
         path=str(qr_path),
-        media_type="image/png",
-        filename="payment_qr.png",
+        media_type=media_type,
+        headers={
+            "Cache-Control": (
+                "no-store, "
+                "no-cache, "
+                "must-revalidate, "
+                "max-age=0"
+            ),
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
     )
 
 
-# =========================================================
+# ============================================================
 # SUBMIT PAYMENT PROOF
-# =========================================================
+# ============================================================
 
 @router.post("/submit-proof/{order_id}")
 async def submit_payment_proof(
     order_id: str,
-    payment: PaymentProofSubmit,
+    payment_reference: str = Form(...),
     screenshot: UploadFile = File(...),
     current_user=Depends(get_current_user),
 ):
     db = get_database()
 
-    # -----------------------------------------------------
-    # Validate order ID
-    # -----------------------------------------------------
+    # ========================================================
+    # VALIDATE ORDER ID
+    # ========================================================
 
     try:
         order_object_id = ObjectId(order_id)
@@ -149,16 +244,24 @@ async def submit_payment_proof(
             detail="Invalid order ID.",
         )
 
-    # -----------------------------------------------------
-    # Find user's order
-    # -----------------------------------------------------
+    # ========================================================
+    # FIND ORDER
+    # ========================================================
+
+    try:
+        user_object_id = ObjectId(
+            current_user["id"]
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user ID.",
+        )
 
     order = db.orders.find_one(
         {
             "_id": order_object_id,
-            "user_id": ObjectId(
-                current_user["id"]
-            ),
+            "user_id": user_object_id,
         }
     )
 
@@ -168,76 +271,101 @@ async def submit_payment_proof(
             detail="Order not found.",
         )
 
-    # -----------------------------------------------------
-    # Prevent duplicate submission
-    # -----------------------------------------------------
+    # ========================================================
+    # PREVENT PAYMENT PROOF ON ALREADY APPROVED ORDER
+    # ========================================================
 
     if (
-        order.get("verification_status")
-        == "verified"
+        order.get("payment_status") == "paid"
+        and order.get("verification_status") == "verified"
     ):
         raise HTTPException(
             status_code=400,
-            detail="This order is already verified.",
+            detail=(
+                "This order has already been paid "
+                "and verified."
+            ),
         )
 
-    if (
-        order.get("payment_status")
-        == "payment_submitted"
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="Payment proof has already been submitted.",
-        )
-
-    # -----------------------------------------------------
-    # Validate payment reference
-    # -----------------------------------------------------
+    # ========================================================
+    # PAYMENT REFERENCE / UTR
+    # ========================================================
 
     payment_reference = (
-        payment.payment_reference.strip()
+        payment_reference.strip()
     )
 
     if len(payment_reference) < 4:
         raise HTTPException(
             status_code=400,
-            detail="Enter a valid payment reference number.",
-        )
-
-    # -----------------------------------------------------
-    # Validate screenshot type
-    # -----------------------------------------------------
-
-    if screenshot.content_type not in ALLOWED_IMAGE_TYPES:
-        raise HTTPException(
-            status_code=400,
             detail=(
-                "Only JPG, PNG, and WEBP "
-                "screenshots are allowed."
+                "Invalid payment reference / UTR."
             ),
         )
 
-    # -----------------------------------------------------
-    # Read screenshot
-    # -----------------------------------------------------
-
-    file_content = await screenshot.read()
-
-    if len(file_content) == 0:
+    if len(payment_reference) > 100:
         raise HTTPException(
             status_code=400,
-            detail="Screenshot is empty.",
+            detail=(
+                "Payment reference is too long."
+            ),
         )
 
-    if len(file_content) > MAX_SCREENSHOT_SIZE:
+    # ========================================================
+    # FILE TYPE VALIDATION
+    # ========================================================
+
+    if (
+        screenshot.content_type
+        not in ALLOWED_IMAGE_TYPES
+    ):
         raise HTTPException(
             status_code=400,
-            detail="Screenshot must be smaller than 5 MB.",
+            detail=(
+                "Only JPG, PNG and WEBP "
+                "payment screenshots are allowed."
+            ),
         )
 
-    # -----------------------------------------------------
-    # Determine extension
-    # -----------------------------------------------------
+    # ========================================================
+    # READ FILE
+    # ========================================================
+
+    file_bytes = await screenshot.read()
+
+    if len(file_bytes) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Uploaded payment screenshot "
+                "is empty."
+            ),
+        )
+
+    # ========================================================
+    # FILE SIZE
+    # ========================================================
+
+    if len(file_bytes) > MAX_SCREENSHOT_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Payment screenshot must be "
+                "smaller than 5 MB."
+            ),
+        )
+
+    # ========================================================
+    # STORAGE DIRECTORY
+    # ========================================================
+
+    payment_proof_dir = (
+        get_payment_proof_directory()
+    )
+
+    # ========================================================
+    # FILE EXTENSION
+    # ========================================================
 
     extension_map = {
         "image/jpeg": ".jpg",
@@ -245,43 +373,54 @@ async def submit_payment_proof(
         "image/webp": ".webp",
     }
 
-    extension = extension_map[
-        screenshot.content_type
-    ]
+    extension = extension_map.get(
+        screenshot.content_type,
+        ".jpg",
+    )
 
-    # -----------------------------------------------------
-    # Generate secure filename
-    # -----------------------------------------------------
+    # ========================================================
+    # SECURE RANDOM FILE NAME
+    # ========================================================
 
-    random_name = secrets.token_hex(16)
-
-    secure_filename = (
-        f"{order['order_number']}_"
-        f"{random_name}"
+    filename = (
+        f"{order_id}_"
+        f"{uuid.uuid4().hex}"
         f"{extension}"
     )
 
-    # -----------------------------------------------------
-    # Save screenshot
-    # -----------------------------------------------------
-
-    payment_directory = (
-        get_payment_proof_directory()
-    )
-
     file_path = (
-        payment_directory
-        / secure_filename
-    )
+        payment_proof_dir
+        / filename
+    ).resolve()
+
+    # ========================================================
+    # SECURITY CHECK
+    # ========================================================
+
+    if (
+        payment_proof_dir
+        not in file_path.parents
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid payment screenshot path.",
+        )
+
+    # ========================================================
+    # SAVE FILE
+    # ========================================================
 
     try:
+
         with open(
             file_path,
             "wb",
         ) as file:
-            file.write(file_content)
+
+            file.write(file_bytes)
 
     except Exception as error:
+
         print(
             "Payment screenshot save error:",
             error,
@@ -294,52 +433,115 @@ async def submit_payment_proof(
             ),
         )
 
-    # -----------------------------------------------------
-    # Update order
-    # -----------------------------------------------------
+    # ========================================================
+    # UPDATE ORDER
+    # ========================================================
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(
+        timezone.utc
+    )
 
-    db.orders.update_one(
+    update_result = db.orders.update_one(
         {
             "_id": order_object_id,
+            "user_id": user_object_id,
         },
         {
             "$set": {
-                "payment_status": "payment_submitted",
-
-                "verification_status": "pending",
 
                 "payment_reference":
                     payment_reference,
 
                 "payment_screenshot":
-                    secure_filename,
+                    str(file_path),
 
-                "download_access": False,
+                "status":
+                    "payment_submitted",
 
-                "updated_at": now,
+                "payment_status":
+                    "payment_submitted",
+
+                "verification_status":
+                    "pending",
+
+                "download_access":
+                    False,
+
+                "updated_at":
+                    now,
             }
         },
     )
 
-    # -----------------------------------------------------
-    # Response
-    # -----------------------------------------------------
+    if update_result.matched_count == 0:
+
+        # Remove uploaded file if order
+        # update unexpectedly failed.
+
+        try:
+            file_path.unlink(
+                missing_ok=True
+            )
+        except Exception:
+            pass
+
+        raise HTTPException(
+            status_code=404,
+            detail="Order not found.",
+        )
+
+    # ========================================================
+    # GET UPDATED ORDER
+    # ========================================================
+
+    updated_order = db.orders.find_one(
+        {
+            "_id": order_object_id,
+            "user_id": user_object_id,
+        }
+    )
+
+    # ========================================================
+    # RESPONSE
+    # ========================================================
 
     return {
         "message": (
-            "Payment proof submitted successfully."
+            "Payment proof submitted "
+            "successfully. Your order is "
+            "waiting for verification."
         ),
-        "order_number":
-            order.get("order_number"),
 
-        "payment_status":
-            "payment_submitted",
+        "order": {
 
-        "verification_status":
-            "pending",
+            "id": str(
+                updated_order["_id"]
+            ),
 
-        "download_access":
-            False,
+            "order_number":
+                updated_order.get(
+                    "order_number"
+                ),
+
+            "payment_reference":
+                updated_order.get(
+                    "payment_reference"
+                ),
+
+            "payment_status":
+                updated_order.get(
+                    "payment_status"
+                ),
+
+            "verification_status":
+                updated_order.get(
+                    "verification_status"
+                ),
+
+            "download_access":
+                updated_order.get(
+                    "download_access",
+                    False,
+                ),
+        },
     }

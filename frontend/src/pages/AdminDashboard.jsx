@@ -1,111 +1,294 @@
-import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  getAdminDashboard,
+} from "../services/adminService";
 
 function AdminDashboard() {
-  const { user } = useAuth();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] =
+    useState(true);
+  const [error, setError] =
+    useState("");
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  const loadDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const result =
+        await getAdminDashboard();
+
+      setData(result);
+
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.detail ||
+        "Unable to load dashboard."
+      );
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        Loading dashboard...
+      </div>
+    );
   }
 
-  if (user.role !== "admin") {
-    return <Navigate to="/" replace />;
+  if (error) {
+    return (
+      <div className="admin-error">
+        {error}
+      </div>
+    );
   }
+
+  const stats =
+    data?.statistics || {};
 
   return (
-    <main className="profile-page">
+    <div className="admin-page">
 
-      <div className="profile-container">
+      <div className="admin-page-heading">
 
-        <div className="profile-header">
+        <div>
+          <span>
+            OVERVIEW
+          </span>
 
-          <div className="profile-avatar">
-            🛡️
+          <h2>
+            Dashboard
+          </h2>
+
+          <p>
+            Monitor your digital store
+            performance.
+          </p>
+        </div>
+
+        <button
+          className="admin-refresh-button"
+          onClick={loadDashboard}
+        >
+          ↻ Refresh
+        </button>
+
+      </div>
+
+
+      {stats.pending_payments > 0 && (
+        <div className="admin-payment-alert">
+
+          <div className="alert-icon">
+            🔴
           </div>
 
           <div>
-            <span className="profile-label">
-              Administrator
-            </span>
-
-            <h1>
-              Welcome, {user.name}
-            </h1>
+            <strong>
+              Payment verification required
+            </strong>
 
             <p>
-              {user.email}
+              {stats.pending_payments} payment
+              {stats.pending_payments !== 1
+                ? "s"
+                : ""} waiting for verification.
             </p>
           </div>
+
+          <a href="/admin/orders">
+            Review Payments →
+          </a>
+
+        </div>
+      )}
+
+
+      <div className="admin-stat-grid">
+
+        <div className="admin-stat-card">
+          <span className="stat-icon">
+            💰
+          </span>
+
+          <span className="stat-label">
+            TOTAL REVENUE
+          </span>
+
+          <strong>
+            ₹
+            {Number(
+              stats.total_revenue || 0
+            ).toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
+          </strong>
+        </div>
+
+
+        <div className="admin-stat-card">
+          <span className="stat-icon">
+            🛒
+          </span>
+
+          <span className="stat-label">
+            TOTAL ORDERS
+          </span>
+
+          <strong>
+            {stats.total_orders || 0}
+          </strong>
+        </div>
+
+
+        <div className="admin-stat-card">
+          <span className="stat-icon">
+            👥
+          </span>
+
+          <span className="stat-label">
+            CUSTOMERS
+          </span>
+
+          <strong>
+            {stats.total_customers || 0}
+          </strong>
+        </div>
+
+
+        <div className="admin-stat-card">
+          <span className="stat-icon">
+            📦
+          </span>
+
+          <span className="stat-label">
+            PRODUCTS
+          </span>
+
+          <strong>
+            {stats.total_products || 0}
+          </strong>
+        </div>
+
+      </div>
+
+
+      <div className="admin-section-card">
+
+        <div className="admin-section-header">
+
+          <div>
+            <h3>
+              Recent Orders
+            </h3>
+
+            <p>
+              Latest customer purchases.
+            </p>
+          </div>
+
+          <a href="/admin/orders">
+            View All →
+          </a>
 
         </div>
 
-        <div className="profile-grid">
 
-          <div className="profile-card">
-            <span>📊</span>
+        <div className="admin-table-wrapper">
 
-            <h3>Dashboard</h3>
+          <table className="admin-table">
 
-            <p>
-              Store statistics and analytics.
-            </p>
-          </div>
+            <thead>
+              <tr>
+                <th>ORDER</th>
+                <th>CUSTOMER</th>
+                <th>AMOUNT</th>
+                <th>PAYMENT</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
 
-          <div className="profile-card">
-            <span>📦</span>
+            <tbody>
 
-            <h3>Products</h3>
+              {data?.recent_orders?.map(
+                (order) => (
+                  <tr key={order.id}>
 
-            <p>
-              Manage your digital products.
-            </p>
-          </div>
+                    <td>
+                      <strong>
+                        {order.order_number}
+                      </strong>
+                    </td>
 
-          <div className="profile-card">
-            <span>🛒</span>
+                    <td>
+                      <div className="table-customer">
+                        <strong>
+                          {
+                            order.customer
+                              ?.name
+                          }
+                        </strong>
 
-            <h3>Orders</h3>
+                        <span>
+                          {
+                            order.customer
+                              ?.email
+                          }
+                        </span>
+                      </div>
+                    </td>
 
-            <p>
-              View and manage customer orders.
-            </p>
-          </div>
+                    <td>
+                      ₹
+                      {Number(
+                        order.total || 0
+                      ).toFixed(2)}
+                    </td>
 
-          <div className="profile-card">
-            <span>👥</span>
+                    <td>
+                      <span
+                        className={`status-badge ${order.payment_status}`}
+                      >
+                        {order.payment_status}
+                      </span>
+                    </td>
 
-            <h3>Customers</h3>
+                    <td>
+                      <span
+                        className={`status-badge ${order.verification_status}`}
+                      >
+                        {
+                          order.verification_status
+                        }
+                      </span>
+                    </td>
 
-            <p>
-              Manage registered customers.
-            </p>
-          </div>
+                  </tr>
+                )
+              )}
 
-          <div className="profile-card">
-            <span>🏷️</span>
+            </tbody>
 
-            <h3>Coupons</h3>
-
-            <p>
-              Create and manage discount coupons.
-            </p>
-          </div>
-
-          <div className="profile-card">
-            <span>📈</span>
-
-            <h3>Analytics</h3>
-
-            <p>
-              Monitor store performance.
-            </p>
-          </div>
+          </table>
 
         </div>
 
       </div>
 
-    </main>
+    </div>
   );
 }
 

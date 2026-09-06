@@ -7,35 +7,52 @@ import {
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// Customer pages
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
-
+import Orders from "./pages/Orders"
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
+
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 
-import AdminDashboard from "./pages/AdminDashboard";
+// Admin
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminGuard from "./components/admin/AdminGuard";
 
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProducts from "./pages/AdminProducts";
+import AdminOrders from "./pages/AdminOrders";
+import AdminCustomers from "./pages/AdminCustomers";
+import AdminCoupons from "./pages/AdminCoupons";
+import ScrollToTop from "./components/ScrollToTop";
+import AdminAnalytics from "./pages/AdminAnalytics";
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
 
+      {/* =========================
+          CUSTOMER NAVBAR
+      ========================= */}
       <Navbar />
 
       <Routes>
 
-        {/* HOME */}
+        {/* =========================
+            CUSTOMER ROUTES
+        ========================= */}
+
         <Route
           path="/"
           element={<Home />}
         />
 
-        {/* PRODUCTS */}
         <Route
           path="/products"
           element={<Products />}
@@ -46,25 +63,24 @@ function App() {
           element={<ProductDetails />}
         />
 
-        {/* CART */}
+        <Route path="/orders" element = {<Orders />}
+        />
+
         <Route
           path="/cart"
           element={<Cart />}
         />
 
-        {/* CHECKOUT */}
         <Route
           path="/checkout"
           element={<Checkout />}
         />
 
-        {/* ORDER SUCCESS */}
         <Route
           path="/order-success/:orderId"
           element={<OrderSuccess />}
         />
 
-        {/* AUTH */}
         <Route
           path="/login"
           element={<Login />}
@@ -75,19 +91,72 @@ function App() {
           element={<Register />}
         />
 
-        {/* PROFILE */}
         <Route
           path="/profile"
           element={<Profile />}
         />
 
-        {/* ADMIN */}
+
+        {/* =========================
+            ADMIN ROUTES
+        ========================= */}
+
         <Route
           path="/admin"
-          element={<AdminDashboard />}
-        />
+          element={<AdminGuard />}
+        >
+
+          {/* Admin Layout */}
+          <Route
+            element={<AdminLayout />}
+          >
+
+            {/* /admin */}
+            <Route
+              index
+              element={<AdminDashboard />}
+            />
+
+            {/* /admin/products */}
+            <Route
+              path="products"
+              element={<AdminProducts />}
+            />
+
+            {/* /admin/orders */}
+            <Route
+              path="orders"
+              element={<AdminOrders />}
+            />
+
+            {/* /admin/customers */}
+            <Route
+              path="customers"
+              element={<AdminCustomers />}
+            />
+
+            {/* /admin/coupons */}
+            <Route
+              path="coupons"
+              element={<AdminCoupons />}
+            />
+
+            {/* /admin/analytics */}
+            <Route
+              path="analytics"
+              element={<AdminAnalytics />}
+            />
+
+          </Route>
+
+        </Route>
 
       </Routes>
+
+
+      {/* =========================
+          CUSTOMER FOOTER
+      ========================= */}
 
       <Footer />
 

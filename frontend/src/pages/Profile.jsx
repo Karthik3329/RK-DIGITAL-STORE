@@ -7,8 +7,6 @@ import {
   updateMyProfile,
 } from "../services/userService";
 
-import "../app.css";
-
 
 function Profile() {
 

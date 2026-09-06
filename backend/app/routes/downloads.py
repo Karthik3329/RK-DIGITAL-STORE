@@ -1,12 +1,12 @@
+from datetime import datetime, timezone
 from pathlib import Path
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from app.config import settings
 from app.database import get_database
-from app.utils.dependencies import get_current_user
+from app.utils.download_tokens import hash_download_token
 
 
 router = APIRouter(
@@ -15,73 +15,80 @@ router = APIRouter(
 )
 
 
-def get_storage_directory() -> Path:
-    """
-    Resolve the secure digital product storage directory.
-    """
-
-    backend_directory = Path(__file__).resolve().parents[2]
-
-    storage_directory = (
-        backend_directory /
-        settings.DIGITAL_FILES_DIR
-    ).resolve()
-
-    storage_directory.mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
-    return storage_directory
-
-
-@router.get("/{order_id}/{product_id}")
-def download_product(
-    order_id: str,
-    product_id: str,
-    current_user=Depends(get_current_user)
-):
+@router.get("/{token}")
+def download_file(token: str):
     db = get_database()
 
-    # -----------------------------------------
-    # Validate order ID
-    # -----------------------------------------
+    # ---------------------------------------------------------
+    # 1. Find token
+    # ---------------------------------------------------------
 
-    try:
-        order_object_id = ObjectId(order_id)
+    token_hash = hash_download_token(token)
 
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid order ID."
-        )
-
-
-    # -----------------------------------------
-    # Validate product ID
-    # -----------------------------------------
-
-    try:
-        product_object_id = ObjectId(product_id)
-
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid product ID."
-        )
-
-
-    # -----------------------------------------
-    # Find user's order
-    # -----------------------------------------
-
-    order = db.orders.find_one({
-        "_id": order_object_id,
-        "user_id": ObjectId(
-            current_user["id"]
-        )
+    token_doc = db.download_tokens.find_one({
+        "token_hash": token_hash
     })
 
+    if not token_doc:
+        raise HTTPException(
+            status_code=404,
+            detail="Invalid or expired download link."
+        )
+
+    # ---------------------------------------------------------
+    # 2. Check token expiry
+    # ---------------------------------------------------------
+
+    now = datetime.now(timezone.utc)
+
+    expires_at = token_doc.get("expires_at")
+
+    if not expires_at:
+        raise HTTPException(
+            status_code=403,
+            detail="Download token has no expiry."
+        )
+
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(
+            tzinfo=timezone.utc
+        )
+
+    if now >= expires_at:
+
+        db.download_tokens.delete_one({
+            "_id": token_doc["_id"]
+        })
+
+        raise HTTPException(
+            status_code=410,
+            detail="Download link has expired."
+        )
+
+    # ---------------------------------------------------------
+    # 3. Find order
+    # ---------------------------------------------------------
+
+    order_id = token_doc.get("order_id")
+
+    if not order_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid download token."
+        )
+
+    if isinstance(order_id, str):
+        try:
+            order_id = ObjectId(order_id)
+        except Exception:
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid order reference."
+            )
+
+    order = db.orders.find_one({
+        "_id": order_id
+    })
 
     if not order:
         raise HTTPException(
@@ -89,70 +96,46 @@ def download_product(
             detail="Order not found."
         )
 
-
-    # -----------------------------------------
-    # Check payment
-    # -----------------------------------------
+    # ---------------------------------------------------------
+    # 4. Check payment
+    # ---------------------------------------------------------
 
     if order.get("payment_status") != "paid":
         raise HTTPException(
             status_code=403,
-            detail="Payment has not been completed."
+            detail="Payment has not been verified."
         )
 
-
-    # -----------------------------------------
-    # Check admin verification
-    # -----------------------------------------
-
-    if order.get("verification_status") != "verified":
-        raise HTTPException(
-            status_code=403,
-            detail="Order has not been verified yet."
-        )
-
-
-    # -----------------------------------------
-    # Check download permission
-    # -----------------------------------------
-
-    if order.get("download_access") is not True:
+    if not order.get("download_access"):
         raise HTTPException(
             status_code=403,
             detail="Download access is not available."
         )
 
+    # ---------------------------------------------------------
+    # 5. Find product
+    # ---------------------------------------------------------
 
-    # -----------------------------------------
-    # Check purchased product
-    # -----------------------------------------
+    product_id = token_doc.get("product_id")
 
-    purchased_item = None
-
-    for item in order.get("items", []):
-
-        if item.get("product_id") == str(
-            product_object_id
-        ):
-            purchased_item = item
-            break
-
-
-    if not purchased_item:
+    if not product_id:
         raise HTTPException(
-            status_code=403,
-            detail="This product was not purchased in this order."
+            status_code=404,
+            detail="Product reference not found."
         )
 
-
-    # -----------------------------------------
-    # Get product
-    # -----------------------------------------
+    if isinstance(product_id, str):
+        try:
+            product_id = ObjectId(product_id)
+        except Exception:
+            raise HTTPException(
+                status_code=404,
+                detail="Invalid product reference."
+            )
 
     product = db.products.find_one({
-        "_id": product_object_id
+        "_id": product_id
     })
-
 
     if not product:
         raise HTTPException(
@@ -160,68 +143,183 @@ def download_product(
             detail="Product not found."
         )
 
+    # ---------------------------------------------------------
+    # 6. Verify product belongs to this order
+    # ---------------------------------------------------------
 
-    # -----------------------------------------
-    # Get stored file name
-    # -----------------------------------------
+    product_is_in_order = False
 
-    file_name = (
-        product.get("file_name")
-        or purchased_item.get("file_name")
-    )
+    for item in order.get("items", []):
 
+        item_product_id = item.get("product_id")
 
-    if not file_name:
+        if isinstance(item_product_id, ObjectId):
+            if item_product_id == product_id:
+                product_is_in_order = True
+                break
+
+        elif str(item_product_id) == str(product_id):
+            product_is_in_order = True
+            break
+
+    if not product_is_in_order:
         raise HTTPException(
-            status_code=404,
-            detail="Digital file is not available."
+            status_code=403,
+            detail="This product is not part of this order."
         )
 
+    # ---------------------------------------------------------
+    # 7. Get file information
+    # ---------------------------------------------------------
 
-    # -----------------------------------------
-    # SECURITY
+    stored_file_path = product.get("file_path")
+    file_name = product.get("file_name")
+
+    print("========================================")
+    print("DOWNLOAD DEBUG")
+    print("Product:", product.get("title"))
+    print("Stored file_path:", stored_file_path)
+    print("Stored file_name:", file_name)
+    print("========================================")
+
+    if not stored_file_path and not file_name:
+        raise HTTPException(
+            status_code=404,
+            detail="Digital file not configured for this product."
+        )
+
+    # ---------------------------------------------------------
+    # 8. Determine backend root
+    # ---------------------------------------------------------
+
+    # __file__:
+    # backend/app/routes/downloads.py
     #
-    # Never allow a path outside our
-    # digital product directory.
-    # -----------------------------------------
+    # parents[0] = routes
+    # parents[1] = app
+    # parents[2] = backend
 
-    storage_directory = get_storage_directory()
+    backend_root = Path(__file__).resolve().parents[2]
 
-    requested_file = (
-        storage_directory /
-        Path(file_name).name
+    products_root = (
+        backend_root / "storage" / "products"
     ).resolve()
 
+    # ---------------------------------------------------------
+    # 9. Resolve the file safely
+    # ---------------------------------------------------------
+
+    file_path = None
+
+    if stored_file_path:
+
+        stored_path = Path(str(stored_file_path))
+
+        # Absolute path
+        if stored_path.is_absolute():
+
+            candidate = stored_path.resolve()
+
+        else:
+
+            # Handle:
+            # storage/products/file.zip
+            # products/file.zip
+            # file.zip
+
+            normalized = str(
+                stored_path
+            ).replace("\\", "/").lstrip("/")
+
+            if normalized.startswith("storage/products/"):
+
+                candidate = (
+                    backend_root / normalized
+                ).resolve()
+
+            elif normalized.startswith("products/"):
+
+                candidate = (
+                    backend_root
+                    / "storage"
+                    / normalized
+                ).resolve()
+
+            else:
+
+                candidate = (
+                    products_root
+                    / normalized
+                ).resolve()
+
+        file_path = candidate
+
+    elif file_name:
+
+        file_path = (
+            products_root
+            / str(file_name)
+        ).resolve()
+
+    # ---------------------------------------------------------
+    # 10. Security check
+    # ---------------------------------------------------------
 
     try:
-        requested_file.relative_to(
-            storage_directory
+
+        file_path.relative_to(
+            products_root
         )
 
     except ValueError:
+
         raise HTTPException(
             status_code=403,
             detail="Invalid digital file path."
         )
 
+    # ---------------------------------------------------------
+    # 11. Check physical file
+    # ---------------------------------------------------------
 
-    # -----------------------------------------
-    # Check file exists
-    # -----------------------------------------
+    print("Resolved file:", file_path)
+    print("File exists:", file_path.is_file())
 
-    if not requested_file.is_file():
+    if not file_path.is_file():
+
         raise HTTPException(
             status_code=404,
-            detail="Digital file could not be found."
+            detail="Digital file not found."
         )
 
+    # ---------------------------------------------------------
+    # 12. Update download statistics
+    # ---------------------------------------------------------
 
-    # -----------------------------------------
-    # Return protected file
-    # -----------------------------------------
+    db.download_tokens.update_one(
+        {
+            "_id": token_doc["_id"]
+        },
+        {
+            "$inc": {
+                "download_count": 1
+            },
+            "$set": {
+                "last_downloaded_at": now
+            }
+        }
+    )
+
+    # ---------------------------------------------------------
+    # 13. Send file
+    # ---------------------------------------------------------
 
     return FileResponse(
-        path=str(requested_file),
-        filename=requested_file.name,
-        media_type="application/octet-stream"
+        path=str(file_path),
+        filename=file_name or file_path.name,
+        media_type="application/octet-stream",
+        headers={
+            "Cache-Control": "no-store",
+            "Pragma": "no-cache"
+        }
     )
