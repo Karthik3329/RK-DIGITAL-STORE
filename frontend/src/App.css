@@ -13250,3 +13250,867 @@ select {
     font-size: 14px;
   }
 }
+/* =========================================================
+   DIGITALSTORE AI - FLOATING BUTTON
+========================================================= */
+
+.ds-ai-floating-button {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+
+  width: 58px;
+  height: 58px;
+
+  border: 0;
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    #8b5cf6,
+    #ec4899
+  );
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 9998;
+
+  box-shadow:
+    0 12px 35px rgba(139, 92, 246, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.ds-ai-floating-button:hover {
+  transform: translateY(-3px) scale(1.03);
+
+  box-shadow:
+    0 18px 45px rgba(139, 92, 246, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* =========================================================
+   BUTTON GLOW
+========================================================= */
+
+.ds-ai-button-glow {
+  position: absolute;
+
+  inset: -6px;
+
+  border-radius: 23px;
+
+  border: 1px solid rgba(168, 85, 247, 0.35);
+
+  animation: dsAiPulse 2.2s infinite;
+
+  pointer-events: none;
+}
+
+@keyframes dsAiPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* =========================================================
+   AI ICON
+========================================================= */
+
+.ds-ai-icon {
+  font-size: 22px;
+  line-height: 1;
+
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================
+   AI LABEL
+========================================================= */
+
+.ds-ai-floating-label {
+  position: absolute;
+
+  right: -4px;
+  top: -7px;
+
+  min-width: 23px;
+  height: 23px;
+
+  padding: 0 5px;
+
+  border-radius: 999px;
+
+  background: #ec4899;
+
+  border: 2px solid #0b0711;
+
+  color: white;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 3;
+}
+
+/* =========================================================
+   AI CHAT WINDOW
+========================================================= */
+
+.ds-ai-window {
+  position: fixed;
+
+  right: 22px;
+  bottom: 22px;
+
+  width: 300px;
+  height: 440px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  z-index: 9999;
+
+  border: 1px solid rgba(168, 85, 247, 0.25);
+
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(139, 92, 246, 0.16),
+      transparent 30%
+    ),
+    #0d0914;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 35px rgba(139, 92, 246, 0.12);
+
+  animation: dsAiOpen 0.25s ease-out;
+}
+
+@keyframes dsAiOpen {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.ds-ai-header {
+  min-height: 54px;
+
+  padding: 8px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  background:
+    rgba(10, 7, 15, 0.82);
+
+  backdrop-filter: blur(18px);
+
+  flex-shrink: 0;
+}
+
+.ds-ai-header-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+/* =========================================================
+   AI AVATAR
+========================================================= */
+
+.ds-ai-avatar {
+  width: 32px;
+  height: 32px;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #ec4899
+    );
+
+  box-shadow:
+    0 6px 18px rgba(139, 92, 246, 0.25);
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.ds-ai-title {
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  line-height: 1.2;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.ds-ai-status {
+  margin-top: 2px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #a9a1b5;
+
+  font-size: 8px;
+
+  line-height: 1;
+}
+
+.ds-ai-status-dot {
+  width: 6px;
+  height: 6px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #34d399;
+
+  box-shadow:
+    0 0 8px rgba(52, 211, 153, 0.65);
+}
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.ds-ai-close {
+  width: 27px;
+  height: 27px;
+
+  flex-shrink: 0;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  color: #aaa2b5;
+
+  font-size: 17px;
+
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.ds-ai-close:hover {
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  color: white;
+}
+
+/* =========================================================
+   MESSAGE AREA
+========================================================= */
+
+.ds-ai-messages {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+
+  padding: 10px 9px;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(139, 92, 246, 0.4)
+    transparent;
+}
+
+/* Chrome / Edge scrollbar */
+
+.ds-ai-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ds-ai-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ds-ai-messages::-webkit-scrollbar-thumb {
+  background:
+    rgba(139, 92, 246, 0.4);
+
+  border-radius: 10px;
+}
+
+/* =========================================================
+   WELCOME LABEL
+========================================================= */
+
+.ds-ai-welcome {
+  width: fit-content;
+
+  max-width: 100%;
+
+  margin:
+    0 auto 10px;
+
+  padding:
+    5px 9px;
+
+  border:
+    1px solid rgba(168, 85, 247, 0.16);
+
+  border-radius: 999px;
+
+  color: #9f96ad;
+
+  background:
+    rgba(139, 92, 246, 0.06);
+
+  font-size: 8px;
+
+  line-height: 1.2;
+}
+
+.ds-ai-welcome span {
+  color: #c084fc;
+
+  margin-right: 4px;
+}
+
+/* =========================================================
+   MESSAGE ROW
+========================================================= */
+
+.ds-ai-message-row {
+  display: flex;
+
+  gap: 5px;
+
+  margin-bottom: 7px;
+}
+
+.ds-ai-user-row {
+  justify-content: flex-end;
+}
+
+/* =========================================================
+   SMALL AI AVATAR
+========================================================= */
+
+.ds-ai-small-avatar {
+  flex:
+    0 0 auto;
+
+  width: 21px;
+  height: 21px;
+
+  margin-top: 2px;
+
+  border-radius: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #ec4899
+    );
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   MESSAGE BUBBLE
+========================================================= */
+
+.ds-ai-message {
+  max-width: 82%;
+
+  padding:
+    7px 9px;
+
+  border-radius: 11px;
+
+  font-size: 10px;
+
+  line-height: 1.45;
+
+  white-space: normal;
+
+  word-break: break-word;
+}
+
+/* =========================================================
+   ASSISTANT MESSAGE
+========================================================= */
+
+.ds-ai-assistant-message {
+  color: #ddd6e5;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-top-left-radius: 4px;
+}
+
+/* =========================================================
+   USER MESSAGE
+========================================================= */
+
+.ds-ai-user-message {
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #c026d3
+    );
+
+  border-top-right-radius: 4px;
+
+  box-shadow:
+    0 6px 18px rgba(124, 58, 237, 0.18);
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.ds-ai-quick-actions {
+  margin-top: 3px;
+}
+
+.ds-ai-quick-title {
+  margin-bottom: 5px;
+
+  color: #8e8598;
+
+  font-size: 7px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+}
+
+.ds-ai-quick-button {
+  width: 100%;
+
+  margin-bottom: 4px;
+
+  padding:
+    6px 8px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border:
+    1px solid rgba(168, 85, 247, 0.16);
+
+  border-radius: 8px;
+
+  background:
+    rgba(139, 92, 246, 0.05);
+
+  color: #cfc6d8;
+
+  font-size: 9px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ds-ai-quick-button:hover {
+  background:
+    rgba(139, 92, 246, 0.11);
+
+  border-color:
+    rgba(168, 85, 247, 0.3);
+
+  color: white;
+
+  transform:
+    translateX(2px);
+}
+
+.ds-ai-quick-button span {
+  color: #a855f7;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   TYPING INDICATOR
+========================================================= */
+
+.ds-ai-typing {
+  min-width: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 3px;
+}
+
+.ds-ai-typing span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #a78bfa;
+
+  animation:
+    dsAiTyping 1.1s infinite;
+}
+
+.ds-ai-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ds-ai-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes dsAiTyping {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+
+    transform:
+      translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+
+    transform:
+      translateY(-3px);
+  }
+}
+
+/* =========================================================
+   INPUT AREA
+========================================================= */
+
+.ds-ai-input-area {
+  padding: 7px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  background:
+    rgba(8, 6, 12, 0.88);
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
+
+.ds-ai-input-wrapper {
+  min-height: 36px;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 6px;
+
+  padding:
+    4px 4px 4px 8px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ds-ai-input-wrapper:focus-within {
+  border-color:
+    rgba(168, 85, 247, 0.5);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(139, 92, 246, 0.08);
+}
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+.ds-ai-input-wrapper textarea {
+  flex: 1;
+
+  min-width: 0;
+
+  max-height: 55px;
+
+  padding:
+    4px 0;
+
+  resize: none;
+
+  border: 0;
+
+  outline: 0;
+
+  background: transparent;
+
+  color: white;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+  font-family: inherit;
+}
+
+.ds-ai-input-wrapper textarea::placeholder {
+  color: #71697b;
+}
+
+/* =========================================================
+   SEND BUTTON
+========================================================= */
+
+.ds-ai-send {
+  width: 27px;
+  height: 27px;
+
+  flex:
+    0 0 auto;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #ec4899
+    );
+
+  color: white;
+
+  font-size: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.ds-ai-send:hover:not(:disabled) {
+  transform:
+    translateY(-1px);
+}
+
+.ds-ai-send:disabled {
+  opacity: 0.35;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   DISCLAIMER
+========================================================= */
+
+.ds-ai-disclaimer {
+  margin-top: 4px;
+
+  color: #625b69;
+
+  font-size: 7px;
+
+  text-align: center;
+
+  line-height: 1.2;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .ds-ai-floating-button {
+    right: 15px;
+    bottom: 15px;
+
+    width: 54px;
+    height: 54px;
+
+    border-radius: 17px;
+  }
+
+  .ds-ai-icon {
+    font-size: 20px;
+  }
+
+  .ds-ai-floating-label {
+    right: -3px;
+    top: -6px;
+
+    min-width: 21px;
+    height: 21px;
+
+    font-size: 8px;
+  }
+
+  .ds-ai-window {
+    right: 10px;
+    bottom: 10px;
+
+    width:
+      calc(100vw - 20px);
+
+    height: 450px;
+
+    max-height:
+      calc(100vh - 20px);
+
+    border-radius: 17px;
+  }
+
+  .ds-ai-header {
+    min-height: 52px;
+
+    padding:
+      7px 9px;
+  }
+
+  .ds-ai-avatar {
+    width: 30px;
+    height: 30px;
+
+    font-size: 14px;
+  }
+
+  .ds-ai-title {
+    font-size: 11px;
+  }
+
+  .ds-ai-status {
+    font-size: 7px;
+  }
+
+  .ds-ai-messages {
+    padding:
+      9px 8px;
+  }
+
+  .ds-ai-message {
+    font-size: 10px;
+  }
+}

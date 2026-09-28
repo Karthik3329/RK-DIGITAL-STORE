@@ -12,10 +12,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
-import Orders from "./pages/Orders"
+import Orders from "./pages/Orders";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
-
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
@@ -29,13 +28,17 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminCustomers from "./pages/AdminCustomers";
 import AdminCoupons from "./pages/AdminCoupons";
-import ScrollToTop from "./components/ScrollToTop";
 import AdminAnalytics from "./pages/AdminAnalytics";
+
+import ScrollToTop from "./components/ScrollToTop";
+
+// DigitalStore AI
+import DigitalStoreAI from "./components/ai/DigitalStoreAI";
 
 function App() {
   return (
     <BrowserRouter>
-    <ScrollToTop />
+      <ScrollToTop />
 
       {/* =========================
           CUSTOMER NAVBAR
@@ -63,7 +66,9 @@ function App() {
           element={<ProductDetails />}
         />
 
-        <Route path="/orders" element = {<Orders />}
+        <Route
+          path="/orders"
+          element={<Orders />}
         />
 
         <Route
@@ -96,7 +101,6 @@ function App() {
           element={<Profile />}
         />
 
-
         {/* =========================
             ADMIN ROUTES
         ========================= */}
@@ -105,54 +109,49 @@ function App() {
           path="/admin"
           element={<AdminGuard />}
         >
-
-          {/* Admin Layout */}
           <Route
             element={<AdminLayout />}
           >
-
-            {/* /admin */}
             <Route
               index
               element={<AdminDashboard />}
             />
 
-            {/* /admin/products */}
             <Route
               path="products"
               element={<AdminProducts />}
             />
 
-            {/* /admin/orders */}
             <Route
               path="orders"
               element={<AdminOrders />}
             />
 
-            {/* /admin/customers */}
             <Route
               path="customers"
               element={<AdminCustomers />}
             />
 
-            {/* /admin/coupons */}
             <Route
               path="coupons"
               element={<AdminCoupons />}
             />
 
-            {/* /admin/analytics */}
             <Route
               path="analytics"
               element={<AdminAnalytics />}
             />
-
           </Route>
-
         </Route>
 
       </Routes>
 
+      {/* =========================
+          DIGITALSTORE AI
+          Available throughout
+          the customer website
+      ========================= */}
+      <DigitalStoreAI />
 
       {/* =========================
           CUSTOMER FOOTER
