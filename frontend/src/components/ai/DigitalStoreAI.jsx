@@ -1,145 +1,144 @@
 import { useEffect, useRef, useState } from "react";
+import api from "../../services/api";
 
-const quickActions = [
-  "Find a product",
-  "Recommend a product",
-  "How does payment work?",
-  "Where is my order?"
-];
-
-const initialMessage = {
-  id: 1,
-  role: "assistant",
-  content:
-    "Hi! I'm DigitalStore AI 👋\n\nI can help you find products, understand our payment process, check orders, and answer questions about DigitalStore."
-};
 
 function DigitalStoreAI() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content:
+        "Hi! I'm DigitalStore AI 👋 How can I help you today?",
+    },
+  ]);
+
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([initialMessage]);
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
   }, [messages, isTyping]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 150);
-    }
-  }, [isOpen]);
-
-  const addMessage = (role, content) => {
-    setMessages((current) => [
-      ...current,
-      {
-        id: Date.now() + Math.random(),
-        role,
-        content
-      }
-    ]);
-  };
-
-  const getDemoResponse = (message) => {
-    const text = message.toLowerCase();
-
-    if (
-      text.includes("product") ||
-      text.includes("template") ||
-      text.includes("find")
-    ) {
-      return "Sure! I can help you find the right digital product. In the next phase, I'll be connected to the DigitalStore product database so I can search your actual products. 🔎";
-    }
-
-    if (
-      text.includes("recommend") ||
-      text.includes("suggest")
-    ) {
-      return "Absolutely! Tell me what you're looking to build, such as a car rental website, business website, dashboard, or another project. I'll recommend suitable products. ✨";
-    }
-
-    if (
-      text.includes("payment") ||
-      text.includes("upi") ||
-      text.includes("pay")
-    ) {
-      return "DigitalStore currently uses manual UPI payment. You pay the displayed amount, enter the UTR/reference number, upload your payment screenshot, and submit it for verification. 💳";
-    }
-
-    if (
-      text.includes("order") ||
-      text.includes("purchase")
-    ) {
-      return "Once you're logged in, I'll be able to help you check your order status. In a future phase, I'll connect directly to your DigitalStore orders. 📦";
-    }
-
-    if (
-      text.includes("download")
-    ) {
-      return "After your payment is verified by the admin, you'll receive a secure download link for your purchased digital product. 📥";
-    }
-
-    if (
-      text.includes("hello") ||
-      text.includes("hi") ||
-      text.includes("hey")
-    ) {
-      return "Hey! 👋 Welcome to DigitalStore. What would you like help with?";
-    }
-
-    return "I'm currently in demo mode 🤖. In the next phase, I'll be connected to the DigitalStore AI backend so I can search products and provide intelligent answers.";
-  };
-
-  const handleSend = async (messageText = input) => {
+  const sendMessage = async (messageText = input) => {
     const message = messageText.trim();
 
     if (!message || isTyping) {
       return;
     }
 
+    const userMessage = {
+      role: "user",
+      content: message,
+    };
+
+    const previousMessages = messages;
+
+    setMessages((current) => [
+      ...current,
+      userMessage,
+    ]);
+
     setInput("");
-
-    addMessage("user", message);
-
     setIsTyping(true);
 
-    setTimeout(() => {
-      const response = getDemoResponse(message);
+    try {
+      const conversationHistory = previousMessages
+        .filter(
+          (item) =>
+            item.role === "user" ||
+            item.role === "assistant"
+        )
+        .slice(-12);
 
-      addMessage("assistant", response);
+      const response = await api.post("/ai/chat", {
+        message,
+        conversation_history: conversationHistory,
+      });
 
+      const aiResponse =
+        response.data?.response ||
+        "Sorry, I couldn't generate a response.";
+
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content: aiResponse,
+        },
+      ]);
+    } catch (error) {
+      console.error(
+        "DigitalStore AI error:",
+        error
+      );
+
+      const detail =
+        error.response?.data?.detail;
+
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content:
+            typeof detail === "string"
+              ? detail
+              : "Sorry, I'm having trouble connecting to the AI service. Please try again.",
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    sendMessage();
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      handleSend();
+      sendMessage();
     }
   };
 
-  const handleQuickAction = (action) => {
-    handleSend(action);
-  };
+  const quickActions = [
+    {
+      label: "🔎 Find products",
+      message: "What products do you have?",
+    },
+    {
+      label: "💰 Check prices",
+      message:
+        "Show me some available products and their prices.",
+    },
+    {
+      label: "🛒 Shopping help",
+      message:
+        "Help me choose a digital product.",
+    },
+    {
+      label: "📦 My orders",
+      message:
+        "How can I check my orders?",
+    },
+  ];
 
   return (
     <>
       {!isOpen && (
         <button
+          type="button"
           className="ds-ai-floating-button"
           onClick={() => setIsOpen(true)}
           aria-label="Open DigitalStore AI"
         >
-          <span className="ds-ai-button-glow"></span>
+          <span className="ds-ai-button-glow" />
 
           <span className="ds-ai-icon">
             ✨
@@ -152,12 +151,12 @@ function DigitalStoreAI() {
       )}
 
       {isOpen && (
-        <div className="ds-ai-window">
-
-          <div className="ds-ai-header">
-
+        <section
+          className="ds-ai-window"
+          aria-label="DigitalStore AI"
+        >
+          <header className="ds-ai-header">
             <div className="ds-ai-header-left">
-
               <div className="ds-ai-avatar">
                 ✨
               </div>
@@ -168,40 +167,37 @@ function DigitalStoreAI() {
                 </div>
 
                 <div className="ds-ai-status">
-                  <span className="ds-ai-status-dot"></span>
-                  Online
+                  <span className="ds-ai-status-dot" />
+                  AI Assistant
                 </div>
               </div>
-
             </div>
 
             <button
+              type="button"
               className="ds-ai-close"
               onClick={() => setIsOpen(false)}
-              aria-label="Close AI assistant"
+              aria-label="Close AI"
             >
               ×
             </button>
-
-          </div>
+          </header>
 
           <div className="ds-ai-messages">
-
             <div className="ds-ai-welcome">
               <span>✦</span>
-              AI Shopping & Support Assistant
+              Ask me anything about DigitalStore
             </div>
 
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <div
-                key={message.id}
+                key={`${message.role}-${index}`}
                 className={`ds-ai-message-row ${
                   message.role === "user"
                     ? "ds-ai-user-row"
-                    : "ds-ai-assistant-row"
+                    : ""
                 }`}
               >
-
                 {message.role === "assistant" && (
                   <div className="ds-ai-small-avatar">
                     ✨
@@ -215,73 +211,59 @@ function DigitalStoreAI() {
                       : "ds-ai-assistant-message"
                   }`}
                 >
-                  {message.content.split("\n").map(
-                    (line, index) => (
-                      <span key={index}>
-                        {line}
-
-                        {index <
-                          message.content.split("\n").length -
-                            1 && <br />}
-                      </span>
-                    )
-                  )}
+                  {message.content}
                 </div>
-
               </div>
             ))}
 
-            {messages.length === 1 && (
-              <div className="ds-ai-quick-actions">
+            {messages.length === 1 &&
+              !isTyping && (
+                <div className="ds-ai-quick-actions">
+                  <div className="ds-ai-quick-title">
+                    Quick actions
+                  </div>
 
-                <div className="ds-ai-quick-title">
-                  Try asking
+                  {quickActions.map((action) => (
+                    <button
+                      key={action.label}
+                      type="button"
+                      className="ds-ai-quick-button"
+                      onClick={() =>
+                        sendMessage(action.message)
+                      }
+                    >
+                      {action.label}
+                      <span>›</span>
+                    </button>
+                  ))}
                 </div>
-
-                {quickActions.map((action) => (
-                  <button
-                    key={action}
-                    className="ds-ai-quick-button"
-                    onClick={() =>
-                      handleQuickAction(action)
-                    }
-                  >
-                    {action}
-                    <span>→</span>
-                  </button>
-                ))}
-
-              </div>
-            )}
+              )}
 
             {isTyping && (
-              <div className="ds-ai-message-row ds-ai-assistant-row">
-
+              <div className="ds-ai-message-row">
                 <div className="ds-ai-small-avatar">
                   ✨
                 </div>
 
-                <div className="ds-ai-message ds-ai-assistant-message ds-ai-typing">
-
-                  <span></span>
-                  <span></span>
-                  <span></span>
-
+                <div className="ds-ai-message ds-ai-assistant-message">
+                  <div className="ds-ai-typing">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </div>
-
               </div>
             )}
 
-            <div ref={messagesEndRef}></div>
-
+            <div ref={messagesEndRef} />
           </div>
 
-          <div className="ds-ai-input-area">
-
+          <form
+            className="ds-ai-input-area"
+            onSubmit={handleSubmit}
+          >
             <div className="ds-ai-input-wrapper">
-
               <textarea
-                ref={inputRef}
                 value={input}
                 onChange={(event) =>
                   setInput(event.target.value)
@@ -293,8 +275,8 @@ function DigitalStoreAI() {
               />
 
               <button
+                type="submit"
                 className="ds-ai-send"
-                onClick={() => handleSend()}
                 disabled={
                   !input.trim() || isTyping
                 }
@@ -302,17 +284,14 @@ function DigitalStoreAI() {
               >
                 ↑
               </button>
-
             </div>
 
             <div className="ds-ai-disclaimer">
-              DigitalStore AI can make mistakes. Verify
-              important information.
+              DigitalStore AI can make mistakes.
+              Verify important information.
             </div>
-
-          </div>
-
-        </div>
+          </form>
+        </section>
       )}
     </>
   );
