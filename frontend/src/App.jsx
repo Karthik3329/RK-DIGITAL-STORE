@@ -34,9 +34,6 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import Contact from "./pages/Contact";
 import ScrollToTop from "./components/ScrollToTop";
 
-// DigitalStore AI
-import DigitalStoreAI from "./components/ai/DigitalStoreAI";
-
 function App() {
   return (
     <BrowserRouter>
@@ -164,17 +161,6 @@ function App() {
         </Route>
 
       </Routes>
-
-      {/* =========================
-          DIGITALSTORE AI
-          Available throughout
-          the customer website
-      ========================= */}
-      <DigitalStoreAI />
-
-      {/* =========================
-          CUSTOMER FOOTER
-      ========================= */}
 
       <Footer />
 
