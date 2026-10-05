@@ -14987,3 +14987,655 @@ select {
     height: 50px;
   }
 }
+/* =========================================================
+   RK DIGITAL STORE - ADMIN CONTACT MESSAGES
+   ========================================================= */
+
+.admin-contact-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 36px 38px 50px;
+  box-sizing: border-box;
+  color: #f5f3ff;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 32px;
+}
+
+.admin-page-label {
+  display: block;
+  margin-bottom: 9px;
+  color: #b56cff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.admin-page-header p {
+  margin: 9px 0 0;
+  max-width: 650px;
+  color: #858092;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   REFRESH BUTTON
+   ========================================================= */
+
+.admin-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 105px;
+  height: 42px;
+  padding: 0 17px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #eeeeff;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-refresh-button:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.admin-error {
+  margin-bottom: 20px;
+  padding: 14px 17px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #ff9b9b;
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   MAIN TWO-COLUMN LAYOUT
+   ========================================================= */
+
+.admin-contact-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+  gap: 20px;
+  min-height: 560px;
+}
+
+
+/* =========================================================
+   MESSAGE LIST
+   ========================================================= */
+
+.admin-contact-list {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(27, 18, 39, 0.96),
+      rgba(12, 10, 19, 0.98)
+    );
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.admin-contact-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.admin-contact-list-header strong {
+  color: #f7f4ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   MESSAGE ITEM
+   ========================================================= */
+
+.admin-message-item {
+  display: block;
+  width: 100%;
+  padding: 18px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-message-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-message-item:hover {
+  background: rgba(168, 85, 247, 0.06);
+}
+
+.admin-message-item.selected {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(168, 85, 247, 0.16),
+      rgba(236, 72, 153, 0.045)
+    );
+  box-shadow:
+    inset 3px 0 0 #a855f7;
+}
+
+
+/* =========================================================
+   MESSAGE TOP
+   ========================================================= */
+
+.admin-message-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-message-top strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.message-status {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+}
+
+.message-status.new {
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+}
+
+.message-status.read {
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: rgba(96, 165, 250, 0.1);
+  color: #93c5fd;
+}
+
+.message-status.replied {
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  background: rgba(52, 211, 153, 0.09);
+  color: #6ee7b7;
+}
+
+.message-status.closed {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.09);
+  color: #cbd5e1;
+}
+
+
+/* =========================================================
+   SUBJECT / PREVIEW / DATE
+   ========================================================= */
+
+.admin-message-subject {
+  margin-top: 10px;
+  overflow: hidden;
+  color: #ddd6fe;
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-message-preview {
+  display: -webkit-box;
+  margin-top: 7px;
+  overflow: hidden;
+  color: #7f788d;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.admin-message-date {
+  margin-top: 11px;
+  color: #625d6d;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   DETAILS PANEL
+   ========================================================= */
+
+.admin-contact-details {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(168, 85, 247, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(25, 17, 37, 0.97),
+      rgba(11, 9, 17, 0.99)
+    );
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================================
+   EMPTY / SELECT MESSAGE
+   ========================================================= */
+
+.admin-empty-state,
+.admin-select-message {
+  display: flex;
+  min-height: 430px;
+  padding: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.admin-empty-icon {
+  display: flex;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 16px;
+  background: rgba(168, 85, 247, 0.09);
+  color: #c084fc;
+  font-size: 23px;
+}
+
+.admin-empty-state h3,
+.admin-select-message h3 {
+  margin: 0;
+  color: #f4f1fa;
+  font-size: 17px;
+}
+
+.admin-empty-state p,
+.admin-select-message p {
+  max-width: 390px;
+  margin: 9px 0 0;
+  color: #716b7d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   DETAIL HEADER
+   ========================================================= */
+
+.admin-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 25px 27px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.admin-detail-header h2 {
+  margin: 0;
+  max-width: 700px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 720;
+  line-height: 1.3;
+}
+
+.admin-close-button {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #aaa2b5;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-close-button:hover {
+  border-color: rgba(236, 72, 153, 0.35);
+  background: rgba(236, 72, 153, 0.1);
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   CUSTOMER DETAILS
+   ========================================================= */
+
+.admin-customer-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 22px 27px 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-customer-details > div {
+  min-width: 0;
+  padding: 16px 18px;
+  background: rgba(13, 10, 20, 0.82);
+}
+
+.admin-customer-details span,
+.admin-full-message > span,
+.admin-action-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #716a7c;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.admin-customer-details strong,
+.admin-customer-details a {
+  display: block;
+  overflow: hidden;
+  color: #e9e3f1;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-customer-details a:hover {
+  color: #c084fc;
+}
+
+
+/* =========================================================
+   FULL MESSAGE
+   ========================================================= */
+
+.admin-full-message {
+  margin: 22px 27px 0;
+  padding: 19px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-full-message p {
+  margin: 0;
+  color: #d5d0dc;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.admin-message-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 22px 27px 27px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.admin-message-actions > div:first-child {
+  min-width: 160px;
+}
+
+.admin-message-actions select {
+  width: 160px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  outline: none;
+  background: #15101d;
+  color: #eee9f5;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-message-actions select:focus {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.09);
+}
+
+.admin-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-reply-button,
+.admin-delete-button {
+  display: inline-flex;
+  height: 40px;
+  padding: 0 15px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-reply-button {
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.2),
+    rgba(236, 72, 153, 0.12)
+  );
+  color: #d8b4fe;
+}
+
+.admin-reply-button:hover {
+  border-color: rgba(192, 132, 252, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.3),
+    rgba(236, 72, 153, 0.18)
+  );
+  transform: translateY(-1px);
+}
+
+.admin-delete-button {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.07);
+  color: #fca5a5;
+}
+
+.admin-delete-button:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.13);
+  color: #fecaca;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .admin-contact-layout {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+
+  .admin-contact-page {
+    padding: 28px 25px 40px;
+  }
+}
+
+
+@media (max-width: 850px) {
+  .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-contact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-contact-list {
+    max-height: 440px;
+    overflow-y: auto;
+  }
+
+  .admin-contact-details {
+    min-height: 500px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .admin-contact-page {
+    padding: 22px 15px 35px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 24px;
+  }
+
+  .admin-page-header p {
+    font-size: 12px;
+  }
+
+  .admin-contact-layout {
+    gap: 14px;
+  }
+
+  .admin-detail-header {
+    padding: 20px;
+  }
+
+  .admin-detail-header h2 {
+    font-size: 18px;
+  }
+
+  .admin-customer-details {
+    grid-template-columns: 1fr;
+    margin: 18px 20px 0;
+  }
+
+  .admin-full-message {
+    margin: 18px 20px 0;
+  }
+
+  .admin-message-actions {
+    align-items: stretch;
+    flex-direction: column;
+    margin: 18px 20px 20px;
+  }
+
+  .admin-message-actions > div:first-child {
+    width: 100%;
+  }
+
+  .admin-message-actions select {
+    width: 100%;
+  }
+
+  .admin-action-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .admin-reply-button,
+  .admin-delete-button {
+    width: 100%;
+  }
+}
