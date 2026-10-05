@@ -7,11 +7,17 @@ load_dotenv()
 class Settings:
     # MongoDB
     MONGODB_URI: str = os.getenv("MONGODB_URI", "")
-    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "digital_store")
+    DATABASE_NAME: str = os.getenv(
+        "DATABASE_NAME",
+        "digital_store"
+    )
 
     # JWT
     JWT_SECRET: str = os.getenv("JWT_SECRET", "")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+    JWT_ALGORITHM: str = os.getenv(
+        "JWT_ALGORITHM",
+        "HS256"
+    )
     JWT_EXPIRE_MINUTES: int = int(
         os.getenv("JWT_EXPIRE_MINUTES", "60")
     )
@@ -58,7 +64,10 @@ class Settings:
 
     # Download token
     DOWNLOAD_TOKEN_EXPIRE_HOURS: int = int(
-        os.getenv("DOWNLOAD_TOKEN_EXPIRE_HOURS", "48")
+        os.getenv(
+            "DOWNLOAD_TOKEN_EXPIRE_HOURS",
+            "48"
+        )
     )
 
     # Gmail SMTP
@@ -68,7 +77,10 @@ class Settings:
     )
 
     SMTP_PORT: int = int(
-        os.getenv("SMTP_PORT", "587")
+        os.getenv(
+            "SMTP_PORT",
+            "587"
+        )
     )
 
     SMTP_USERNAME: str = os.getenv(
@@ -89,6 +101,14 @@ class Settings:
     SMTP_FROM_NAME: str = os.getenv(
         "SMTP_FROM_NAME",
         "DigitalStore"
+    )
+
+    # Password reset
+    PASSWORD_RESET_EXPIRE_MINUTES: int = int(
+        os.getenv(
+            "PASSWORD_RESET_EXPIRE_MINUTES",
+            "30"
+        )
     )
 
 

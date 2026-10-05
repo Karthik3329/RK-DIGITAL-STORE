@@ -1,18 +1,31 @@
 # =========================================================
-# DIGITAL STORE - ROOT GITIGNORE
+# RK DIGITAL STORE - ROOT GITIGNORE
 # =========================================================
 
-# ---------------------------------------------------------
-# Environment / Secrets
-# ---------------------------------------------------------
+
+# =========================================================
+# ENVIRONMENT / SECRETS
+# =========================================================
+
 .env
 .env.*
 !.env.example
 
-# ---------------------------------------------------------
-# Python
-# ---------------------------------------------------------
+# Local secrets / credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+
+# =========================================================
+# PYTHON
+# =========================================================
+
 __pycache__/
+**/__pycache__/
+
 *.py[cod]
 *$py.class
 *.pyo
@@ -23,104 +36,260 @@ venv/
 .venv/
 env/
 ENV/
+
 backend/venv/
 backend/.venv/
+backend/env/
 
-# Python tools
+# Python tooling
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.pyre/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
 
-# ---------------------------------------------------------
-# Node / React / Vite
-# ---------------------------------------------------------
+
+# =========================================================
+# NODE / REACT / VITE
+# =========================================================
+
 node_modules/
+**/node_modules/
+
 frontend/node_modules/
 
 # Build output
 dist/
+**/dist/
+
 build/
+**/build/
+
 frontend/dist/
 frontend/build/
 
 # Vite
 .vite/
+**/.vite/
 
-# npm logs
+# npm / yarn / pnpm logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ---------------------------------------------------------
-# IDE / Editor
-# ---------------------------------------------------------
+# Package manager caches
+.npm/
+.yarn/
+.pnpm-store/
+
+
+# =========================================================
+# BACKEND STORAGE
+# =========================================================
+
+# Customer payment screenshots
+# NEVER commit these
+backend/storage/payment_proofs/
+**/storage/payment_proofs/
+
+# Uploaded files
+backend/uploads/
+**/uploads/
+
+backend/uploads/products/
+**/uploads/products/
+
+# Temporary files
+backend/tmp/
+backend/temp/
+**/tmp/
+**/temp/
+
+
+# =========================================================
+# DIGITAL PRODUCT FILES
+# =========================================================
+
+# IMPORTANT:
+# Digital products are normally private/protected files.
+# Do NOT push them to GitHub.
+#
+# Store them locally during development and later use
+# secure cloud/object storage for production.
+
+backend/storage/products/
+**/storage/products/
+
+
+# =========================================================
+# PAYMENT QR / PAYMENT ASSETS
+# =========================================================
+
+# Local payment QR
+backend/payment_qr.png
+
+# Possible alternate QR locations
+backend/storage/payment_qr.png
+backend/storage/payment_qr.jpg
+backend/storage/payment_qr.jpeg
+
+
+# =========================================================
+# DATABASE FILES
+# =========================================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+
+# =========================================================
+# LOGS
+# =========================================================
+
+*.log
+logs/
+**/logs/
+
+backend/logs/
+
+
+# =========================================================
+# TEST / TEMPORARY FILES
+# =========================================================
+
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+*.swp
+*.swo
+*~
+
+
+# =========================================================
+# IDE / EDITOR
+# =========================================================
+
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 
 .idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
 
-# ---------------------------------------------------------
-# Backend generated/cache files
-# ---------------------------------------------------------
-backend/**/__pycache__/
-backend/.pytest_cache/
+# Visual Studio
+.vs/
 
-# ---------------------------------------------------------
-# Payment proof uploads
-# NEVER upload customer payment screenshots
-# ---------------------------------------------------------
-backend/storage/payment_proofs/
+# JetBrains
+*.iml
 
-# ---------------------------------------------------------
-# Temporary uploads
-# ---------------------------------------------------------
-backend/uploads/
-backend/uploads/products/
 
-# ---------------------------------------------------------
-# Local digital product files
-# IMPORTANT:
-# Uncomment this if you DO NOT want product files pushed
-# to GitHub.
-# ---------------------------------------------------------
-# backend/storage/products/
+# =========================================================
+# OS FILES
+# =========================================================
 
-# ---------------------------------------------------------
-# Local database files
-# ---------------------------------------------------------
-*.db
-*.sqlite
-*.sqlite3
-
-# ---------------------------------------------------------
-# Logs
-# ---------------------------------------------------------
-*.log
-logs/
-
-# ---------------------------------------------------------
-# Test / temporary files
-# ---------------------------------------------------------
-*.tmp
-*.temp
-*.bak
-
-# ---------------------------------------------------------
-# OS files
-# ---------------------------------------------------------
 .DS_Store
 .DS_Store?
 ._*
+
 .Spotlight-V100
 .Trashes
+
 ehthumbs.db
+Thumbs.db
 Desktop.ini
-backend/payment_qr.png
+
+
+# =========================================================
+# FRONTEND ENVIRONMENT FILES
+# =========================================================
+
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+
+# =========================================================
+# BACKEND ENVIRONMENT FILES
+# =========================================================
+
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+
+# =========================================================
+# GENERATED FILES
+# =========================================================
+
+*.cache
+*.pid
+
+backend/*.pid
+frontend/*.pid
+
+
+# =========================================================
+# LOCAL DEVELOPMENT FILES
+# =========================================================
+
+*.local
+
+backend/.local/
+frontend/.local/
+
+
+# =========================================================
+# PYTHON BUILD / DISTRIBUTION
+# =========================================================
+
+*.egg
+*.egg-info/
+dist/
+build/
+
+pip-wheel-metadata/
+share/python-wheels/
+
+MANIFEST
+
+
+# =========================================================
+# SECURITY
+# =========================================================
+
+# Private certificates / signing files
+*.pem
+*.key
+*.secret
+*.token
+
+# Service account credentials
+service-account*.json
+*-service-account.json
+
+
+# =========================================================
+# BACKUP / EXPORT FILES
+# =========================================================
+
+*.zip
+*.rar
+*.7z
+
+# Local exports
+exports/
+backend/exports/
+frontend/exports/

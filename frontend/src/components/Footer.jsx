@@ -1,20 +1,25 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="footer">
 
       <div className="footer-inner">
 
+        {/* BRAND */}
         <div className="footer-brand">
 
-          <div className="logo">
-            <span className="logo-icon">
-              D
-            </span>
+          <Link to="/" className="logo footer-logo">
+            <img
+              src="/rk-digital-logo.png"
+              alt="RK Digital Store"
+              className="logo-image"
+            />
 
-            <span>
-              Digital<span>Store</span>
+            <span className="logo-text">
+              RK <span>Digital</span> Store
             </span>
-          </div>
+          </Link>
 
           <p>
             Premium digital products for
@@ -24,36 +29,43 @@ function Footer() {
 
         </div>
 
+        {/* LINKS */}
         <div className="footer-links">
 
           <div>
             <h4>Store</h4>
-            <a href="/products">
+
+            <Link to="/products">
               Products
-            </a>
-            <a href="/products">
-              Categories
-            </a>
+            </Link>
+
+            <Link to="/products">
+              Browse Products
+            </Link>
           </div>
 
           <div>
             <h4>Support</h4>
-            <a href="/">
+
+            <Link to="/contact">
               Contact
-            </a>
-            <a href="/">
+            </Link>
+
+            <Link to="/contact">
               FAQ
-            </a>
+            </Link>
           </div>
 
           <div>
             <h4>Legal</h4>
-            <a href="/">
+
+            <Link to="/privacy">
               Privacy
-            </a>
-            <a href="/">
+            </Link>
+
+            <Link to="/terms">
               Terms
-            </a>
+            </Link>
           </div>
 
         </div>
@@ -61,7 +73,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        © {new Date().getFullYear()} DigitalStore.
+        © {new Date().getFullYear()} RK Digital Store.
         All rights reserved.
       </div>
 

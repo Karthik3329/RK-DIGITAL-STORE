@@ -149,6 +149,12 @@ function Login() {
 
           </div>
 
+          <div className="forgot-password-row">
+  <Link to="/forgot-password">
+    Forgot Password?
+  </Link>
+</div>
+
 
           {/* LOGIN BUTTON */}
 

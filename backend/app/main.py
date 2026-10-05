@@ -19,8 +19,8 @@ from app.routes.coupons import router as coupons_router
 from app.routes.downloads import router as downloads_router
 from app.routes.analytics import router as analytics_router
 from app.routes.ai import router as ai_router
-from app.routes.contact import router as contact_router
 
+from app.routes.contact import router as contact_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
@@ -82,6 +82,7 @@ app.include_router(downloads_router)
 app.include_router(analytics_router)
 app.include_router(ai_router)
 app.include_router(contact_router)
+
 
 # =========================
 # ROOT

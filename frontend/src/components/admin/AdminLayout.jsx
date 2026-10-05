@@ -40,26 +40,29 @@ function AdminLayout() {
       label: "Analytics",
       icon: "📈",
     },
+    {
+      to: "/admin/messages",
+      label: "Messages",
+      icon: "✉️",
+    },
   ];
 
   return (
     <div className="admin-shell">
 
-      {/* =========================
-          SIDEBAR
-      ========================= */}
+      {/* SIDEBAR */}
       <aside className="admin-sidebar">
 
         {/* BRAND */}
         <div className="admin-brand">
 
           <div className="admin-brand-icon">
-            D
+            RK
           </div>
 
           <div>
             <strong>
-              Digital<span>Store</span>
+              RK <span>Digital</span> Store
             </strong>
 
             <small>
@@ -68,7 +71,6 @@ function AdminLayout() {
           </div>
 
         </div>
-
 
         {/* NAVIGATION */}
         <nav className="admin-navigation">
@@ -100,7 +102,6 @@ function AdminLayout() {
 
         </nav>
 
-
         {/* SIDEBAR BOTTOM */}
         <div className="admin-sidebar-bottom">
 
@@ -116,7 +117,6 @@ function AdminLayout() {
               View Store
             </span>
           </NavLink>
-
 
           <button
             type="button"
@@ -136,10 +136,7 @@ function AdminLayout() {
 
       </aside>
 
-
-      {/* =========================
-          MAIN CONTENT
-      ========================= */}
+      {/* MAIN CONTENT */}
       <main className="admin-main">
 
         {/* TOPBAR */}
@@ -154,7 +151,6 @@ function AdminLayout() {
               Store Management
             </h1>
           </div>
-
 
           {/* ADMIN PROFILE */}
           <div className="admin-profile">
@@ -178,7 +174,6 @@ function AdminLayout() {
           </div>
 
         </header>
-
 
         {/* PAGE CONTENT */}
         <div className="admin-content">

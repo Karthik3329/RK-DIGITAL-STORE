@@ -15,23 +15,20 @@ function Navbar() {
 
   return (
     <header className="navbar">
-
       <div className="navbar-inner">
 
         {/* LOGO */}
-        <Link
-          to="/"
-          className="logo"
-        >
-          <span className="logo-icon">
-            D
-          </span>
+        <Link to="/" className="logo">
+          <img
+            src="/rk-digital-logo.png"
+            alt="RK Digital Store"
+            className="logo-image"
+          />
 
-          <span>
-            Digital<span>Store</span>
+          <span className="logo-text">
+            RK <span>Digital</span> Store
           </span>
         </Link>
-
 
         {/* NAVIGATION */}
         <nav className="nav-links">
@@ -44,6 +41,10 @@ function Navbar() {
             Products
           </NavLink>
 
+          <NavLink to="/contact">
+            Contact
+          </NavLink>
+
           {user?.role === "admin" && (
             <NavLink to="/admin">
               Admin
@@ -51,7 +52,6 @@ function Navbar() {
           )}
 
         </nav>
-
 
         {/* ACTIONS */}
         <div className="nav-actions">
@@ -70,7 +70,6 @@ function Navbar() {
               </span>
             )}
           </Link>
-
 
           {/* USER */}
           {!loading && user ? (
@@ -113,7 +112,6 @@ function Navbar() {
         </div>
 
       </div>
-
     </header>
   );
 }

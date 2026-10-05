@@ -6,6 +6,8 @@ import {
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Customer pages
 import Login from "./pages/Login";
@@ -22,14 +24,14 @@ import OrderSuccess from "./pages/OrderSuccess";
 // Admin
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminGuard from "./components/admin/AdminGuard";
-
+import AdminContactMessages from "./pages/AdminContactMessages";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminCustomers from "./pages/AdminCustomers";
 import AdminCoupons from "./pages/AdminCoupons";
 import AdminAnalytics from "./pages/AdminAnalytics";
-
+import Contact from "./pages/Contact";
 import ScrollToTop from "./components/ScrollToTop";
 
 // DigitalStore AI
@@ -70,6 +72,20 @@ function App() {
           path="/orders"
           element={<Orders />}
         />
+        <Route
+  path="/contact"
+  element={<Contact />}
+/>
+
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password/:token"
+  element={<ResetPassword />}
+/>
 
         <Route
           path="/cart"
@@ -141,7 +157,10 @@ function App() {
               path="analytics"
               element={<AdminAnalytics />}
             />
-          </Route>
+<Route
+  path="messages"
+  element={<AdminContactMessages />}
+/>          </Route>
         </Route>
 
       </Routes>
