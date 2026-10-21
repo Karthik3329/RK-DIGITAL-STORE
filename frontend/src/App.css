@@ -15940,3 +15940,903 @@ select {
     animation: none;
   }
 }
+
+/* ==========================================
+   RK DIGITAL STORE
+   CUSTOMER + ADMIN DOWNLOADS
+========================================== */
+
+:root {
+  --dl-bg: #0b0812;
+  --dl-surface: #171020;
+  --dl-surface-2: #21172d;
+  --dl-border: #382746;
+  --dl-text: #f8f5ff;
+  --dl-muted: #aa9bbd;
+  --dl-purple: #a855f7;
+  --dl-pink: #db2777;
+  --dl-success: #4ade80;
+  --dl-danger: #fca5a5;
+}
+
+/* ==========================================
+   1. CUSTOMER DOWNLOADS PAGE
+========================================== */
+
+.downloads-page {
+  min-height: 75vh;
+  padding: 52px 24px 85px;
+  background:
+    radial-gradient(
+      ellipse at 15% 0%,
+      rgba(126, 34, 206, 0.12),
+      transparent 45%
+    ),
+    var(--dl-bg);
+  color: var(--dl-text);
+}
+
+.downloads-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.downloads-header {
+  margin-bottom: 34px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--dl-border);
+}
+
+.downloads-header::before {
+  content: "YOUR DIGITAL LIBRARY";
+  display: block;
+  margin-bottom: 12px;
+  color: #c084fc;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.downloads-header h1 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.downloads-header p {
+  margin: 0;
+  color: var(--dl-muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Customer cards */
+
+.downloads-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.download-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 28px;
+  background: linear-gradient(
+    145deg,
+    #1c1427,
+    #130e1c
+  );
+  border: 1px solid var(--dl-border);
+  border-radius: 18px;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.download-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    #9333ea,
+    #d946ef,
+    #ec4899
+  );
+}
+
+.download-card::after {
+  content: "↓";
+  position: absolute;
+  top: 23px;
+  right: 23px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(168, 85, 247, 0.13);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+  color: #d8b4fe;
+  font-size: 25px;
+  pointer-events: none;
+}
+
+.download-card:hover {
+  transform: translateY(-4px);
+  border-color: #8551a5;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.download-card h2 {
+  max-width: calc(100% - 55px);
+  margin: 0 0 13px;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.download-order-number {
+  margin: 0 0 19px;
+  color: var(--dl-muted);
+  font-size: 13px;
+}
+
+.download-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 13px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 999px;
+  color: var(--dl-success);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.download-card > div:last-child {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 25px;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 22px;
+  background: linear-gradient(
+    135deg,
+    #9333ea,
+    #c026d3,
+    #db2777
+  );
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    filter 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.download-button:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(168, 85, 247, 0.25);
+}
+
+.download-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Customer loading, empty, error */
+
+.downloads-page .downloads-loading,
+.downloads-page .downloads-empty {
+  min-height: 220px;
+  padding: 55px 24px;
+  background: var(--dl-surface);
+  border: 1px dashed #624275;
+  border-radius: 16px;
+  color: var(--dl-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+
+.downloads-page .downloads-empty::before {
+  content: "📂";
+  display: block;
+  margin-bottom: 15px;
+  font-size: 40px;
+}
+
+.downloads-error {
+  margin-bottom: 22px;
+  padding: 15px 18px;
+  background: rgba(239, 68, 68, 0.09);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 10px;
+  color: var(--dl-danger);
+  font-size: 14px;
+}
+
+/* ==========================================
+   2. ADMIN DOWNLOADS PAGE
+========================================== */
+
+.admin-downloads-page {
+  width: 100%;
+  min-width: 0;
+  color: var(--dl-text);
+}
+
+.admin-downloads-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-downloads-header h1 {
+  margin: 0 0 9px;
+  color: #ffffff;
+  font-size: clamp(25px, 3vw, 33px);
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.admin-downloads-header p {
+  margin: 0;
+  color: var(--dl-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.adm-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: #c084fc;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.adm-refresh-button {
+  padding: 11px 17px;
+  background: var(--dl-surface-2);
+  border: 1px solid #57366a;
+  border-radius: 10px;
+  color: #f3e8ff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adm-refresh-button:hover:not(:disabled) {
+  border-color: var(--dl-purple);
+  background: #30203e;
+}
+
+/* ==========================================
+   ADMIN STATISTICS
+========================================== */
+
+.admin-downloads-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.admin-download-stat {
+  padding: 23px;
+  background: linear-gradient(
+    145deg,
+    #1d1428,
+    #150f1f
+  );
+  border: 1px solid var(--dl-border);
+  border-radius: 15px;
+}
+
+.admin-download-stat span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--dl-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-download-stat strong {
+  display: block;
+  color: #ffffff;
+  font-size: 31px;
+  font-weight: 800;
+}
+
+/* ==========================================
+   ADMIN PANELS AND LAYOUT
+========================================== */
+
+.adm-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  align-items: start;
+  gap: 22px;
+}
+
+.admin-downloads-panel {
+  min-width: 0;
+  background: var(--dl-surface);
+  border: 1px solid var(--dl-border);
+  border-radius: 17px;
+  overflow: hidden;
+}
+
+.admin-downloads-panel-header {
+  padding: 22px 25px;
+  background: #1b1325;
+  border-bottom: 1px solid var(--dl-border);
+}
+
+.admin-downloads-panel-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.admin-downloads-panel-header p {
+  margin: 7px 0 0;
+  color: var(--dl-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   ADMIN UPLOAD FORM
+========================================== */
+
+.adm-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  padding: 26px;
+}
+
+.admin-upload-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-upload-field label {
+  color: #f5f1ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.adm-required {
+  color: #e879f9;
+}
+
+.admin-upload-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 15px;
+  background: var(--dl-surface-2);
+  border: 1px solid #57366a;
+  border-radius: 10px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.admin-upload-field select:focus {
+  border-color: var(--dl-purple);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.12);
+}
+
+.admin-upload-field select option {
+  background: #21172d;
+  color: #ffffff;
+}
+
+.admin-upload-field small {
+  color: var(--dl-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Selected product */
+
+.adm-product-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  background: var(--dl-surface-2);
+  border: 1px solid #493057;
+  border-radius: 11px;
+}
+
+.adm-summary-icon {
+  font-size: 24px;
+}
+
+.adm-product-summary strong {
+  display: block;
+  color: #ffffff;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.adm-product-summary small {
+  display: block;
+  margin-top: 5px;
+  color: var(--dl-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   FILE UPLOAD BOX
+========================================== */
+
+.adm-file-dropzone {
+  padding: 27px 20px;
+  background: #1d1428;
+  border: 1px dashed #75428f;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.adm-file-icon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 15px;
+  background: #372047;
+  border-radius: 13px;
+  color: #d8b4fe;
+  font-size: 28px;
+}
+
+.adm-file-dropzone strong {
+  display: block;
+  color: #ffffff;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.adm-file-dropzone p {
+  margin: 8px 0 17px;
+  color: var(--dl-muted);
+  font-size: 12px;
+}
+
+.adm-file-dropzone input[type="file"] {
+  display: block;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 11px;
+  background: #291c37;
+  border: 1px solid #50315f;
+  border-radius: 9px;
+  color: #e9e1f3;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.adm-file-dropzone input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 9px 13px;
+  background: #432556;
+  border: 1px solid #75428f;
+  border-radius: 7px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adm-remove-file {
+  display: block;
+  margin: 13px auto 0;
+  padding: 5px;
+  background: transparent;
+  border: none;
+  color: #f9a8d4;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Upload button */
+
+.admin-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 11px 19px;
+  background: linear-gradient(
+    135deg,
+    #9333ea,
+    #c026d3
+  );
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.admin-upload-button:hover:not(:disabled) {
+  filter: brightness(1.13);
+  transform: translateY(-1px);
+}
+
+.admin-upload-button:disabled,
+.adm-refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.adm-submit-button {
+  align-self: flex-start;
+  min-width: 210px;
+}
+
+/* ==========================================
+   ADMIN HELP CARD
+========================================== */
+
+.adm-help-card {
+  padding: 24px;
+  background: #191123;
+  border: 1px solid var(--dl-border);
+  border-radius: 17px;
+}
+
+.adm-help-icon {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 29px;
+}
+
+.adm-help-card h3 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: 17px;
+}
+
+.adm-help-card h4 {
+  margin: 0 0 14px;
+  color: #e9d5ff;
+  font-size: 13px;
+}
+
+.adm-help-card p {
+  margin: 0 0 12px;
+  color: var(--dl-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.adm-help-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: #392748;
+}
+
+.adm-help-note {
+  margin-top: 20px;
+  padding: 14px;
+  background: #291c37;
+  border: 1px solid #493057;
+  border-radius: 10px;
+  color: #d8b4fe;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ==========================================
+   ADMIN EXISTING PRODUCT FILES
+========================================== */
+
+.adm-products-panel {
+  margin-top: 26px;
+}
+
+.adm-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.adm-search {
+  width: min(100%, 280px);
+  min-height: 42px;
+  padding: 10px 14px;
+  background: var(--dl-surface-2);
+  border: 1px solid #493057;
+  border-radius: 9px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.adm-search::placeholder {
+  color: #9f8db2;
+}
+
+.adm-search:focus {
+  border-color: var(--dl-purple);
+}
+
+.admin-downloads-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-downloads-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-downloads-table th {
+  padding: 17px 20px;
+  background: #21172d;
+  border-bottom: 1px solid var(--dl-border);
+  color: #c5b4d7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-downloads-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid #30203e;
+  color: #e9e1f3;
+  font-size: 13px;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.admin-downloads-table tbody tr:hover td {
+  background: #21172d;
+}
+
+.admin-downloads-table td:first-child {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.admin-file-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.admin-file-status.uploaded {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  color: #4ade80;
+}
+
+.admin-file-status.missing {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.adm-row-action {
+  padding: 9px 15px;
+  background: #352044;
+  border: 1px solid #75428f;
+  border-radius: 9px;
+  color: #e9d5ff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adm-row-action:hover {
+  background: #49305c;
+}
+
+/* ==========================================
+   ADMIN ALERTS / EMPTY / LOADING
+========================================== */
+
+.admin-downloads-message {
+  margin-bottom: 20px;
+  padding: 15px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.admin-downloads-message.success {
+  background: rgba(34, 197, 94, 0.09);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #86efac;
+}
+
+.admin-downloads-message.error {
+  background: rgba(239, 68, 68, 0.09);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #fca5a5;
+}
+
+.admin-downloads-page .downloads-loading,
+.admin-downloads-page .downloads-empty {
+  padding: 55px 24px;
+  background: #171020;
+  color: var(--dl-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+
+.admin-downloads-page .downloads-empty strong {
+  display: block;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.admin-downloads-page .downloads-empty p {
+  max-width: 500px;
+  margin: 12px auto 0;
+  font-size: 13px;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 1100px) {
+  .adm-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .downloads-grid {
+    gap: 18px;
+  }
+
+  .admin-downloads-stats {
+    gap: 12px;
+  }
+
+  .admin-download-stat {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .downloads-page {
+    padding: 34px 16px 60px;
+  }
+
+  .downloads-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .download-card {
+    padding: 23px;
+  }
+
+  .download-button {
+    width: 100%;
+  }
+
+  .admin-downloads-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-upload-form {
+    padding: 18px;
+  }
+
+  .adm-help-card {
+    padding: 18px;
+  }
+
+  .admin-downloads-panel-header {
+    padding: 19px;
+  }
+
+  .admin-downloads-table {
+    min-width: 620px;
+  }
+
+  .adm-search,
+  .adm-refresh-button,
+  .adm-submit-button {
+    width: 100%;
+  }
+
+  .adm-submit-button {
+    align-self: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .download-card,
+  .download-button,
+  .admin-upload-button {
+    transition: none;
+  }
+}
+
+.checkout-free-box {
+  margin: 24px;
+  padding: 30px 24px;
+  background: linear-gradient(135deg, #1d1428, #14251e);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.checkout-free-box .checkout-step {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  background: rgba(34, 197, 94, 0.12);
+  border-radius: 50%;
+  color: #4ade80;
+  font-size: 24px;
+}
+
+.checkout-free-box h2 {
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.checkout-free-box p {
+  color: #b8a8c9;
+  font-size: 14px;
+  line-height: 1.8;
+}

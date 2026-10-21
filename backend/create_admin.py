@@ -4,8 +4,8 @@ from app.database import connect_to_database, get_database
 from app.utils.auth import hash_password
 
 
-ADMIN_EMAIL = "admin@digitalstore.com"
-ADMIN_PASSWORD = "Admin@12345"
+ADMIN_EMAIL = "supoort.rkdigital@gmail.com"
+ADMIN_PASSWORD = "Rkdigital@123"
 
 
 connect_to_database()

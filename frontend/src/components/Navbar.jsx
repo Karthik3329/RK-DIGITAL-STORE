@@ -1,17 +1,14 @@
+
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 function Navbar() {
-  const {
-    user,
-    logout,
-    loading,
-  } = useAuth();
+  const { user, logout, loading } = useAuth();
+  const { cartCount } = useCart();
 
-  const {
-    cartCount,
-  } = useCart();
+  const isAdmin = user?.role === "admin";
+  const isLoggedIn = Boolean(user);
 
   return (
     <header className="navbar">
@@ -33,7 +30,7 @@ function Navbar() {
         {/* NAVIGATION */}
         <nav className="nav-links">
 
-          <NavLink to="/">
+          <NavLink to="/" end>
             Home
           </NavLink>
 
@@ -45,9 +42,24 @@ function Navbar() {
             Contact
           </NavLink>
 
-          {user?.role === "admin" && (
+          {/* CUSTOMER DOWNLOADS */}
+          {isLoggedIn && (
+            <NavLink to="/downloads">
+              My Downloads
+            </NavLink>
+          )}
+
+          {/* ADMIN DASHBOARD */}
+          {isAdmin && (
             <NavLink to="/admin">
               Admin
+            </NavLink>
+          )}
+
+          {/* ADMIN FILE MANAGEMENT */}
+          {isAdmin && (
+            <NavLink to="/admin/downloads">
+              Manage Downloads
             </NavLink>
           )}
 
@@ -56,11 +68,12 @@ function Navbar() {
         {/* ACTIONS */}
         <div className="nav-actions">
 
-          {/* CART */}
+          {/* SHOPPING CART */}
           <Link
             to="/cart"
             className="cart-button"
-            title="Cart"
+            title="Shopping Cart"
+            aria-label="Shopping Cart"
           >
             🛒
 
@@ -71,25 +84,21 @@ function Navbar() {
             )}
           </Link>
 
-          {/* USER */}
-          {!loading && user ? (
-
+          {/* USER MENU */}
+          {!loading && isLoggedIn ? (
             <div className="user-menu">
 
               <Link
-                to={
-                  user.role === "admin"
-                    ? "/admin"
-                    : "/profile"
-                }
+                to={isAdmin ? "/admin" : "/profile"}
                 className="user-name"
               >
-                {user.role === "admin"
+                {isAdmin
                   ? "🛡️ Admin"
-                  : `Hi, ${user.name}`}
+                  : `Hi, ${user.name || "Customer"}`}
               </Link>
 
               <button
+                type="button"
                 className="logout-button"
                 onClick={logout}
               >
@@ -97,16 +106,13 @@ function Navbar() {
               </button>
 
             </div>
-
           ) : !loading ? (
-
             <Link
               to="/login"
               className="login-button"
             >
               Login
             </Link>
-
           ) : null}
 
         </div>

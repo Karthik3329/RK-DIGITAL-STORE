@@ -1,3 +1,4 @@
+
 import {
   NavLink,
   Outlet,
@@ -19,6 +20,11 @@ function AdminLayout() {
       to: "/admin/products",
       label: "Products",
       icon: "📦",
+    },
+    {
+      to: "/admin/downloads",
+      label: "Downloads",
+      icon: "📥",
     },
     {
       to: "/admin/orders",
@@ -118,6 +124,19 @@ function AdminLayout() {
             </span>
           </NavLink>
 
+          <NavLink
+            to="/downloads"
+            className="admin-nav-link"
+          >
+            <span className="admin-nav-icon">
+              📁
+            </span>
+
+            <span>
+              My Downloads
+            </span>
+          </NavLink>
+
           <button
             type="button"
             className="admin-nav-link admin-logout"
@@ -166,7 +185,7 @@ function AdminLayout() {
               </strong>
 
               <span>
-                {user?.email || "admin@digitalstore.com"}
+                {user?.email || "Administrator"}
               </span>
 
             </div>

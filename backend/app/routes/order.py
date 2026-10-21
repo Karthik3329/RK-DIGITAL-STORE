@@ -1,4 +1,5 @@
 import re
+import math
 import secrets
 from datetime import datetime, timezone
 from pathlib import Path
@@ -124,6 +125,8 @@ def serialize_order(order):
         "payment_reference": order.get(
             "payment_reference"
         ),
+
+        "payment_method": order.get("payment_method"),
 
         # Never send the actual private
         # screenshot filesystem path.
@@ -397,6 +400,9 @@ def create_order(
 
     calculated_items = []
 
+    if not order_data.items:
+        raise HTTPException(status_code=400, detail="Cart is empty.")
+
     subtotal = 0.0
 
     # -----------------------------------------------------
@@ -442,6 +448,12 @@ def create_order(
         quantity = int(
             requested_item.quantity
         )
+
+        if not math.isfinite(price) or price < 0:
+            raise HTTPException(status_code=400, detail="Invalid product price.")
+
+        if quantity < 1:
+            raise HTTPException(status_code=400, detail="Quantity must be at least 1.")
 
         item_total = (
             price * quantity
@@ -497,6 +509,10 @@ def create_order(
         2
     )
 
+    # The server calculates the final price from product records
+    # and a validated coupon, never from a browser-supplied total.
+    is_free_order = total == 0.0
+
     now = datetime.now(
         timezone.utc
     )
@@ -538,13 +554,15 @@ def create_order(
         # PAYMENT STATE
         # -------------------------------------------------
 
-        "status": "pending_payment",
+        "status": "completed" if is_free_order else "pending_payment",
 
-        "payment_status": "unpaid",
+        "payment_status": "paid" if is_free_order else "unpaid",
 
-        "verification_status": "pending",
+        "verification_status": "approved" if is_free_order else "pending",
 
-        "download_access": False,
+        "download_access": is_free_order,
+
+        "payment_method": "free" if is_free_order else "manual_upi",
 
         # -------------------------------------------------
         # MANUAL PAYMENT DATA
@@ -556,7 +574,7 @@ def create_order(
 
         "verified_by": None,
 
-        "verified_at": None,
+        "verified_at": now if is_free_order else None,
 
         "rejection_reason": None,
 
@@ -565,9 +583,30 @@ def create_order(
         "updated_at": now,
     }
 
-    result = db.orders.insert_one(
-        order
-    )
+    # A free order consumes a coupon immediately rather than
+    # waiting for an admin payment approval that will never occur.
+    # Use a conditional update so limited coupons cannot be
+    # over-redeemed by concurrent free checkouts.
+    coupon_reserved = False
+    if is_free_order and coupon is not None:
+        coupon_filter = {"_id": coupon["_id"], "active": True}
+        if coupon.get("usage_limit") is not None:
+            coupon_filter["used_count"] = {"$lt": int(coupon["usage_limit"])}
+        updated = db.coupons.update_one(
+            coupon_filter, {"$inc": {"used_count": 1}}
+        )
+        if updated.modified_count != 1:
+            raise HTTPException(status_code=409, detail="Coupon is no longer available.")
+        coupon_reserved = True
+
+    try:
+        result = db.orders.insert_one(order)
+    except Exception:
+        if coupon_reserved:
+            db.coupons.update_one(
+                {"_id": coupon["_id"]}, {"$inc": {"used_count": -1}}
+            )
+        raise
 
     order["_id"] = result.inserted_id
 
