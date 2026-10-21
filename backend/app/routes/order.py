@@ -486,6 +486,25 @@ def create_order(
         2
     )
 
+    # Stop duplicate items in a single cart and repeat purchases.
+    requested_ids = [str(item["product_id"]) for item in calculated_items]
+    if len(requested_ids) != len(set(requested_ids)):
+        raise HTTPException(status_code=400, detail="The same product appears more than once in your cart.")
+
+    # A product is owned only after payment approval and download unlock.
+    # Unpaid, rejected, and cancelled orders do not block retrying.
+    previously_purchased = db.orders.find_one({
+        "user_id": user_id,
+        "payment_status": "paid",
+        "download_access": True,
+        "items.product_id": {"$in": [ObjectId(pid) for pid in requested_ids]},
+    })
+    if previously_purchased:
+        raise HTTPException(
+            status_code=409,
+            detail="You already purchased one or more products in this cart. Open My Downloads instead.",
+        )
+
     # -----------------------------------------------------
     # COUPON
     # -----------------------------------------------------
@@ -620,6 +639,23 @@ def create_order(
 # IMPORTANT:
 # THIS MUST COME BEFORE /{order_id}
 # =========================================================
+
+@router.get("/owned-products")
+def get_owned_products(current_user=Depends(get_current_user)):
+    db = get_database()
+    user_id = ObjectId(current_user["id"])
+    orders = db.orders.find({
+        "user_id": user_id,
+        "payment_status": "paid",
+        "download_access": True,
+    }, {"items.product_id": 1})
+    product_ids = set()
+    for order in orders:
+        for item in order.get("items", []):
+            if item.get("product_id"):
+                product_ids.add(str(item["product_id"]))
+    return {"product_ids": sorted(product_ids)}
+
 
 @router.get("/my-orders")
 def get_my_orders(
