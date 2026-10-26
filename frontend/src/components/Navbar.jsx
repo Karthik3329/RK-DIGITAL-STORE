@@ -1,121 +1,185 @@
 
-import { Link, NavLink } from "react-router-dom";
+import { useState } from "react";
+import {
+  Link,
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const { user, logout, loading } = useAuth();
   const { cartCount } = useCart();
 
-  const isAdmin = user?.role === "admin";
-  const isLoggedIn = Boolean(user);
+  const navigate = useNavigate();
+
+  const closeMenu = () => setMenuOpen(false);
+
+  const goToProtectedPage = (path) => {
+    closeMenu();
+
+    if (loading) return;
+
+    if (!user) {
+      navigate("/login", {
+        state: { from: path },
+      });
+      return;
+    }
+
+    navigate(path);
+  };
+
+  const handleLogout = () => {
+    closeMenu();
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="navbar">
       <div className="navbar-inner">
 
         {/* LOGO */}
-        <Link to="/" className="logo">
-          <img
-            src="/rk-digital-logo.png"
-            alt="RK Digital Store"
-            className="logo-image"
-          />
-
+        <Link
+          to="/"
+          className="logo"
+          onClick={closeMenu}
+        >
+          <span className="logo-icon">RK</span>
           <span className="logo-text">
-            RK <span>Digital</span> Store
+            RK <span>DIGITAL STORE</span>
           </span>
         </Link>
 
         {/* NAVIGATION */}
-        <nav className="nav-links">
-
-          <NavLink to="/" end>
+        <nav
+          id="mobile-navigation"
+          className={`nav-links ${menuOpen ? "mobile-open" : ""}`}
+        >
+          <NavLink
+            to="/"
+            end
+            onClick={closeMenu}
+          >
             Home
           </NavLink>
 
-          <NavLink to="/products">
-            Products
-          </NavLink>
-
-          <NavLink to="/contact">
-            Contact
-          </NavLink>
-
-          {/* CUSTOMER DOWNLOADS */}
-          {isLoggedIn && (
-            <NavLink to="/downloads">
-              My Downloads
-            </NavLink>
-          )}
-
-          {/* ADMIN DASHBOARD */}
-          {isAdmin && (
-            <NavLink to="/admin">
-              Admin
-            </NavLink>
-          )}
-
-          {/* ADMIN FILE MANAGEMENT */}
-          {isAdmin && (
-            <NavLink to="/admin/downloads">
-              Manage Downloads
-            </NavLink>
-          )}
-
-        </nav>
-
-        {/* ACTIONS */}
-        <div className="nav-actions">
-
-          {/* SHOPPING CART */}
-          <Link
-            to="/cart"
-            className="cart-button"
-            title="Shopping Cart"
-            aria-label="Shopping Cart"
+          <button
+            type="button"
+            className="nav-link-button"
+            onClick={() => goToProtectedPage("/products")}
           >
-            🛒
+            Browse Products
+          </button>
 
-            {cartCount > 0 && (
-              <span className="cart-count">
-                {cartCount}
-              </span>
-            )}
-          </Link>
+          <button
+            type="button"
+            className="nav-link-button"
+            onClick={() => goToProtectedPage("/downloads")}
+          >
+            My Downloads
+          </button>
 
-          {/* USER MENU */}
-          {!loading && isLoggedIn ? (
-            <div className="user-menu">
+          {user?.role === "admin" && (
+            <NavLink
+              to="/admin"
+              onClick={closeMenu}
+            >
+              Admin Panel
+            </NavLink>
+          )}
 
-              <Link
-                to={isAdmin ? "/admin" : "/profile"}
-                className="user-name"
-              >
-                {isAdmin
-                  ? "🛡️ Admin"
-                  : `Hi, ${user.name || "Customer"}`}
-              </Link>
+          {user && (
+            <NavLink
+              to="/profile"
+              onClick={closeMenu}
+            >
+              My Profile
+            </NavLink>
+          )}
 
+          {user && (
+            <NavLink
+              to="/cart"
+              className="mobile-cart-link"
+              onClick={closeMenu}
+            >
+              Cart ({cartCount})
+            </NavLink>
+          )}
+
+          {/* MOBILE AUTH */}
+          {!loading && (
+            user ? (
               <button
                 type="button"
-                className="logout-button"
-                onClick={logout}
+                className="mobile-auth-button"
+                onClick={handleLogout}
               >
                 Logout
               </button>
+            ) : (
+              <Link
+                to="/login"
+                className="mobile-auth-button"
+                onClick={closeMenu}
+              >
+                Login
+              </Link>
+            )
+          )}
+        </nav>
 
-            </div>
-          ) : !loading ? (
+        {/* DESKTOP ACTIONS */}
+        <div className="nav-actions">
+
+          {user && (
             <Link
-              to="/login"
-              className="login-button"
+              to="/cart"
+              className="cart-button"
+              aria-label={`Cart with ${cartCount} items`}
             >
-              Login
+              <span className="cart-symbol">🛒</span>
+              <span className="cart-count">{cartCount}</span>
             </Link>
-          ) : null}
+          )}
 
+          {!loading && (
+            user ? (
+              <button
+                type="button"
+                className="logout-button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="login-button"
+              >
+                Login
+              </Link>
+            )
+          )}
         </div>
+
+        {/* MOBILE MENU */}
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
 
       </div>
     </header>

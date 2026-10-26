@@ -1,30 +1,77 @@
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import ProductCard from "../components/ProductCard";
-
-import {
-  getFeaturedProducts,
-} from "../services/productService";
+import { useAuth } from "../context/AuthContext";
+import { getFeaturedProducts } from "../services/productService";
 
 function Home() {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ==========================================
+  // PROTECTED NAVIGATION
+  // ==========================================
+
+  const navigateProtected = (path) => {
+    if (authLoading) return;
+
+    if (!user) {
+      navigate("/login", {
+        state: { from: path },
+      });
+      return;
+    }
+
+    navigate(path);
+  };
+
+  // Browse Products
+  const handleBrowseProducts = () => {
+    navigateProtected("/products");
+  };
+
+  // Featured Product
+  const handleFeaturedProduct = (product) => {
+    const productPath = product.slug
+      ? `/products/${product.slug}`
+      : `/products/${product.id}`;
+
+    navigateProtected(productPath);
+  };
+
+  // ==========================================
+  // LOAD FEATURED PRODUCTS
+  // ==========================================
+
   useEffect(() => {
+    let active = true;
+
     const loadHomeData = async () => {
       try {
         const productsData = await getFeaturedProducts();
 
-        setProducts(productsData.products || []);
+        if (active) {
+          setProducts(productsData.products || []);
+        }
       } catch (error) {
         console.error("Home data error:", error);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
     loadHomeData();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -58,12 +105,14 @@ function Home() {
 
           <div className="hero-buttons">
 
-            <Link
-              to="/products"
+            <button
+              type="button"
               className="primary-button"
+              onClick={handleBrowseProducts}
+              disabled={authLoading}
             >
               Explore Products →
-            </Link>
+            </button>
 
             <a
               href="#featured"
@@ -75,17 +124,10 @@ function Home() {
           </div>
 
           <div className="hero-stats">
-
-            <div>
-              <strong>50+</strong>
-              <span>Happy Customers</span>
-            </div>
-
             <div>
               <strong>24/7</strong>
-              <span>Instant Access</span>
+              <span>Digital Store Access</span>
             </div>
-
           </div>
 
         </div>
@@ -94,11 +136,13 @@ function Home() {
 
           <div className="floating-card card-one">
 
-            <span>⚡</span>
+            <span>🔒</span>
 
             <div>
-              <strong>Instant Download</strong>
-              <small>Get your files immediately</small>
+              <strong>Secure Downloads</strong>
+              <small>
+                Available after payment approval
+              </small>
             </div>
 
           </div>
@@ -126,7 +170,11 @@ function Home() {
               <div className="preview-line" />
               <div className="preview-line short" />
 
-              <button>
+              <button
+                type="button"
+                onClick={handleBrowseProducts}
+                disabled={authLoading}
+              >
                 Explore Collection
               </button>
 
@@ -149,7 +197,6 @@ function Home() {
 
       </section>
 
-
       {/* ================= FEATURED PRODUCTS ================= */}
 
       <section
@@ -160,31 +207,28 @@ function Home() {
         <div className="section-header">
 
           <div>
-
             <span className="section-label">
               HANDPICKED FOR YOU
             </span>
 
-            <h2>
-              Featured Products
-            </h2>
+            <h2>Featured Products</h2>
 
             <p>
               High-quality digital products
               ready to power your next project.
             </p>
-
           </div>
 
-          <Link
-            to="/products"
+          <button
+            type="button"
             className="view-all"
+            onClick={handleBrowseProducts}
+            disabled={authLoading}
           >
             View All →
-          </Link>
+          </button>
 
         </div>
-
 
         {loading ? (
 
@@ -198,10 +242,38 @@ function Home() {
 
             {products.map((product) => (
 
-              <ProductCard
+              <div
                 key={product.id}
-                product={product}
-              />
+                className="featured-product-clickable"
+                role="link"
+                tabIndex={0}
+                onClick={(event) => {
+                  // Prevent card click from overriding
+                  // interactive elements inside ProductCard
+                  if (
+                    event.target.closest(
+                      "a, button, input, select, textarea"
+                    )
+                  ) {
+                    return;
+                  }
+
+                  handleFeaturedProduct(product);
+                }}
+                onKeyDown={(event) => {
+                  if (
+                    event.target === event.currentTarget &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    handleFeaturedProduct(product);
+                  }
+                }}
+              >
+                <ProductCard
+                  product={product}
+                />
+              </div>
 
             ))}
 
@@ -217,13 +289,11 @@ function Home() {
 
       </section>
 
-
       {/* ================= CTA ================= */}
 
       <section className="cta-section">
 
         <div>
-
           <span className="section-label">
             READY TO CREATE?
           </span>
@@ -237,15 +307,16 @@ function Home() {
             Explore our growing collection of
             premium digital products.
           </p>
-
         </div>
 
-        <Link
-          to="/products"
+        <button
+          type="button"
           className="primary-button"
+          onClick={handleBrowseProducts}
+          disabled={authLoading}
         >
           Start Exploring →
-        </Link>
+        </button>
 
       </section>
 
