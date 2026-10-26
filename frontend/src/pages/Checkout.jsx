@@ -339,13 +339,13 @@ export default function Checkout() {
                   </div>
                   <div className="payment-amount-label">AMOUNT TO PAY</div>
                   <div className="payment-amount">₹{finalTotal.toFixed(2)}</div>
-                  {/* <div className="payment-upi">
+                  <div className="payment-upi">
                     <span>UPI ID</span><strong>{paymentDetails.upi_id || "Loading..."}</strong>
                   </div>
                   <div className="payment-account">
                     <span>Account Name</span>
                     <strong>{paymentDetails.account_name || "DigitalStore"}</strong>
-                  </div> */}
+                  </div>
                   <div className="payment-instruction">
                     <strong>How to pay</strong>
                     <ol>
